@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/cloudwego/hertz v0.6.6
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	google.golang.org/protobuf v1.31.0
 )
 
@@ -19,7 +20,7 @@ require (
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/nyaruka/phonenumbers v1.0.55 // indirect
-	github.com/tidwall/gjson v1.13.0 // indirect
+	github.com/tidwall/gjson v1.14.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
