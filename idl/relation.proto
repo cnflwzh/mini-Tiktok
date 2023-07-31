@@ -6,7 +6,7 @@ import "common.proto";
 option go_package = "social/relation";
 
 message douyin_relation_action_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required int64 to_user_id = 2; // 对方用户id
   required int32 action_type = 3; // 1-关注，2-取消关注
 }
@@ -18,7 +18,7 @@ message douyin_relation_action_response {
 
 message douyin_relation_follow_list_request {
   required int64 user_id = 1; // 用户id
-  required string token = 2; // 用户鉴权token
+  required int64 token = 2; // 用户鉴权token
 }
 
 message douyin_relation_follow_list_response {
@@ -29,7 +29,7 @@ message douyin_relation_follow_list_response {
 
 message douyin_relation_follower_list_request {
   required int64 user_id = 1; // 用户id
-  required string token = 2; // 用户鉴权token
+  required int64 token_id = 2; // 用户鉴权token
 }
 
 message douyin_relation_follower_list_response {
@@ -40,7 +40,7 @@ message douyin_relation_follower_list_response {
 
 message douyin_relation_friend_list_request {
   required int64 user_id = 1; // 用户id
-  required string token = 2; // 用户鉴权token
+  required int64 token_id = 2; // 用户鉴权token
 }
 
 message douyin_relation_friend_list_response {

@@ -6,7 +6,7 @@ import "common.proto";
 option go_package = "publish";
 
 message douyin_publish_action_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required bytes data = 2; // 视频数据
   required string title = 3; // 视频标题
 }

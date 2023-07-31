@@ -14,7 +14,7 @@ message Comment {
 }
 
 message douyin_comment_action_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required int64 video_id = 2; // 视频id
   required int32 action_type = 3; // 1-发布评论，2-删除评论
   optional string comment_text = 4; // 用户填写的评论内容，在action_type=1的时候使用
@@ -28,7 +28,7 @@ message douyin_comment_action_response {
 }
 
 message douyin_comment_list_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required int64 video_id = 2; // 视频id
 }
 
