@@ -3,6 +3,8 @@
 package favorite
 
 import (
+	JWT "mini-Tiktok/biz/middleware/jwt"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -17,8 +19,8 @@ func _douyinMw() []app.HandlerFunc {
 }
 
 func _favoriteMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 添加 JWTAuth 中间件
+	return JWT.JWTAuthMiddleware()
 }
 
 func _actionMw() []app.HandlerFunc {

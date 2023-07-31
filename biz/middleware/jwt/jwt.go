@@ -1,9 +1,11 @@
 package jwt
 
 import (
+	"context"
 	"fmt"
 	"time"
 
+	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -64,4 +66,59 @@ func ParseToken(tokenString string) (int, error) {
 	}
 
 	return 0, fmt.Errorf("invalid token")
+}
+
+// JWTAuthMiddleware 由token生成用户ID的中间件
+func JWTAuthMiddleware() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			// 从请求头中获取Token
+			tokenString, ok := c.Get("token")
+			if !ok {
+				hlog.Error("Get Token from header fail")
+				c.AbortWithStatus(401)
+				return
+			}
+			// 解析Token
+			userID, err := ParseToken(tokenString.(string))
+			if err != nil {
+				hlog.Error("Parse Token Fail:", err)
+				c.AbortWithStatus(401)
+				return
+			}
+			// 将用户ID存入上下文
+			c.Set("userID", userID)
+			c.Next(ctx)
+		}}
+}
+
+// JWTGenMiddleware 由用户ID生成token的中间件
+func JWTGenMiddleware() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		func(ctx context.Context, c *app.RequestContext) {
+			// 从上下文中获取用户ID
+			userID, ok := c.Get("userID")
+			if !ok {
+				hlog.Error("Get userID from context fail")
+				c.AbortWithStatus(401)
+				return
+			}
+			// 从上下文中获取用户名
+			username, ok := c.Get("username")
+			if !ok {
+				hlog.Error("Get username from context fail")
+				c.AbortWithStatus(401)
+				return
+			}
+			// 生成Token
+			token, err := GenerateToken(username.(string), userID.(int))
+			if err != nil {
+				hlog.Error("Generate token fail:", err)
+				c.AbortWithStatus(401)
+				return
+			}
+			// 将Token存入上下文
+			c.Set("token", token)
+			c.Next(ctx)
+		}}
 }
