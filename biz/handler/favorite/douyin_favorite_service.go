@@ -7,6 +7,7 @@ import (
 
 	dal "mini-Tiktok/biz/dal/mysql"
 
+	common "mini-Tiktok/biz/model/common"
 	video "mini-Tiktok/biz/model/common/video"
 	favorite "mini-Tiktok/biz/model/interact/favorite"
 
@@ -94,5 +95,39 @@ func List(ctx context.Context, c *app.RequestContext) {
 		}
 		videos[i] = *v
 	}
+	// 将视频信息转化为common video
+	commonVideos := make([]*common.Video, len(videos))
+	for i, v := range videos {
+		user, err := dal.GetUserById(v.UserId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+		u := common.User{
+			Id:              &user.Id,
+			Name:            &user.Name,
+			FollowCount:     nil,
+			FollowerCount:   &user.FollowerCount,
+			Avatar:          &user.Avater,
+			BackgroundImage: &user.BackgroundImage,
+			Signature:       &user.Signature,
+			TotalFavorited:  &user.TotalFavorited,
+			WorkCount:       nil,
+			FavoriteCount:   nil,
+			IsFollow:        nil, // 这里不需要关注信息
+		}
+		commonVideos[i] = &common.Video{
+			Id: &v.Id,
+			// 这里用一个函数来获取视频作者信息
+			Author:        &u,
+			PlayUrl:       &v.PlayUrl,
+			CoverUrl:      &v.CoverUrl,
+			FavoriteCount: &v.FavoriteCount,
+			CommentCount:  &v.CommentCount,
+			IsFavorite:    nil, // 这里是肯定点过赞的
+			Title:         &v.Title,
+		}
+	}
+	resp.VideoList = append(resp.VideoList, commonVideos...)
 	c.JSON(consts.StatusOK, resp)
 }
