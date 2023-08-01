@@ -4,6 +4,7 @@ package relation
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -38,6 +39,8 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowListResponse)
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "user" + strconv.FormatInt(req.GetUserId(), 10) + " is browsing follow list"
 
 	c.JSON(consts.StatusOK, resp)
 }

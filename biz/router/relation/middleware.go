@@ -3,7 +3,11 @@
 package relation
 
 import (
+	"context"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	relation "mini-Tiktok/biz/model/social/relation"
+	"mini-Tiktok/middleware"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -32,8 +36,14 @@ func _followMw() []app.HandlerFunc {
 }
 
 func _relationfollowlistMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
+		var req relation.DouyinRelationFollowListRequest
+		_, err := middleware.ParseToken(req.GetToken())
+		if err != nil {
+			ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
+			return
+		}
+	}}
 }
 
 func _followerMw() []app.HandlerFunc {
