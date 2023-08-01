@@ -5,9 +5,14 @@ package favorite
 import (
 	"context"
 
+	dal "mini-Tiktok/biz/dal/mysql"
+
+	common "mini-Tiktok/biz/model/common"
+	video "mini-Tiktok/biz/model/common/video"
+	favorite "mini-Tiktok/biz/model/interact/favorite"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	favorite "mini-Tiktok/biz/model/interact/favorite"
 )
 
 // Action .
@@ -20,9 +25,46 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	// 判断当前用户是否已经点赞
+	isFavorite, err := dal.IsFavorite(*req.UserId, *req.VideoId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 	resp := new(favorite.DouyinFavoriteActionResponse)
-
+	if err != nil {
+		c.String(consts.StatusBadRequest, "invalid token")
+		return
+	}
+	// 判断当前请求是否需要执行
+	if *req.ActionType == 1 && isFavorite {
+		*resp.StatusCode = 1
+		*resp.StatusMsg = "已经点过赞了"
+	}
+	if *req.ActionType == 2 && !isFavorite {
+		*resp.StatusCode = 2
+		*resp.StatusMsg = "不能给未点赞的视频取消点赞"
+	}
+	if *req.ActionType == 1 && !isFavorite {
+		// 添加点赞
+		err = dal.AddFavorite(*req.UserId, *req.VideoId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+		*resp.StatusCode = 0
+		*resp.StatusMsg = "点赞成功"
+	}
+	if *req.ActionType == 2 && isFavorite {
+		// 取消点赞
+		err = dal.DeleteFavorite(*req.UserId, *req.VideoId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+		*resp.StatusCode = 0
+		*resp.StatusMsg = "取消点赞成功"
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -36,8 +78,56 @@ func List(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
+	// 获取点赞列表
+	favorites, err := dal.GetFavoriteList(*req.UserId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		return
+	}
 	resp := new(favorite.DouyinFavoriteListResponse)
-
+	// 从点赞列表中的视频 id 获取视频信息
+	videos := make([]video.Video, len(favorites))
+	for i, favorite := range favorites {
+		v, err := dal.GetVideo(favorite.VideoId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+		videos[i] = *v
+	}
+	// 将视频信息转化为common video
+	commonVideos := make([]*common.Video, len(videos))
+	for i, v := range videos {
+		user, err := dal.GetUserById(v.UserId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			return
+		}
+		u := common.User{
+			Id:              &user.Id,
+			Name:            &user.Name,
+			FollowCount:     nil,
+			FollowerCount:   &user.FollowerCount,
+			Avatar:          &user.Avater,
+			BackgroundImage: &user.BackgroundImage,
+			Signature:       &user.Signature,
+			TotalFavorited:  &user.TotalFavorited,
+			WorkCount:       nil,
+			FavoriteCount:   nil,
+			IsFollow:        nil, // 这里不需要关注信息
+		}
+		commonVideos[i] = &common.Video{
+			Id: &v.Id,
+			// 这里用一个函数来获取视频作者信息
+			Author:        &u,
+			PlayUrl:       &v.PlayUrl,
+			CoverUrl:      &v.CoverUrl,
+			FavoriteCount: &v.FavoriteCount,
+			CommentCount:  &v.CommentCount,
+			IsFavorite:    nil, // 这里是肯定点过赞的
+			Title:         &v.Title,
+		}
+	}
+	resp.VideoList = append(resp.VideoList, commonVideos...)
 	c.JSON(consts.StatusOK, resp)
 }
