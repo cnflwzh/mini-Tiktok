@@ -5,24 +5,113 @@ package comment
 import (
 	"context"
 
+	dal "mini-Tiktok/biz/dal/mysql"
+	common "mini-Tiktok/biz/model/common"
+	comment "mini-Tiktok/biz/model/interact/comment"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	comment "mini-Tiktok/biz/model/interact/comment"
 )
+
+// 提取出一个从数据库中获取用户信息并将其转换为common.User的函数
+func getUserInfo(userID int64) (*common.User, error) {
+	// 获取用户信息
+	userInfo, err := dal.GetUserById(userID)
+	if err != nil {
+		return nil, err
+	}
+	// 设置用户信息
+	followCount := int64(userInfo.FollowCount)
+	workCount := int64(userInfo.WorkCount)
+	favoriteCount := int64(userInfo.FavoriteCount)
+	uId := int64(userInfo.ID)
+	user := common.User{
+		Id:              &uId,
+		Name:            &userInfo.Name,
+		FollowCount:     &followCount,
+		FollowerCount:   &userInfo.FollowerCount,
+		BackgroundImage: &userInfo.BackgroundImage,
+		Signature:       &userInfo.Signature,
+		TotalFavorited:  &userInfo.TotalFavorited,
+		WorkCount:       &workCount,
+		FavoriteCount:   &favoriteCount,
+		Avatar:          &userInfo.Avater,
+		IsFollow:        nil, //等待查询用户是否关注的接口
+	}
+	return &user, nil
+}
 
 // CommentAction .
 // @router douyin/comment/action [POST]
 func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req comment.DouyinCommentActionRequest
+	var comID int64
+	var createTime string
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
 	resp := new(comment.DouyinCommentActionResponse)
-
+	// 判断当前用户行为是删除评论还是添加评论
+	// 如果是删除评论，判断当前用户是否是评论的作者
+	isAdd := *req.ActionType == 1
+	if !isAdd {
+		// 判断当前用户是否是评论的作者
+		isAuthor, err := dal.IsCommentAuthor(*req.UserId, *req.CommentId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			*resp.StatusCode = 1
+			*resp.StatusMsg = err.Error()
+			c.JSON(consts.StatusOK, resp)
+			return
+		}
+		if !isAuthor {
+			c.String(consts.StatusBadRequest, "不是评论的作者，不能删除评论")
+			*resp.StatusCode = 1
+			*resp.StatusMsg = "不是评论的作者，不能删除评论"
+			c.JSON(consts.StatusOK, resp)
+			return
+		}
+		// 删除评论
+		comID, createTime, err = dal.DeleteComment(*req.CommentId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			*resp.StatusCode = 1
+			*resp.StatusMsg = err.Error()
+			c.JSON(consts.StatusOK, resp)
+			return
+		}
+	} else {
+		// 添加评论
+		comID, createTime, err = dal.AddComment(*req.UserId, *req.VideoId, *req.CommentText)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			*resp.StatusCode = 1
+			*resp.StatusMsg = err.Error()
+			c.JSON(consts.StatusOK, resp)
+			return
+		}
+	}
+	// 获取用户信息
+	user, err := getUserInfo(*req.UserId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		*resp.StatusCode = 1
+		*resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+	// 设置响应
+	*resp.StatusCode = 0
+	*resp.StatusMsg = "success"
+	*resp.Comment = comment.Comment{
+		Id:         &comID,
+		User:       user,
+		Content:    req.CommentText,
+		CreateDate: &createTime,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -36,8 +125,41 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
 	resp := new(comment.DouyinCommentListResponse)
-
+	// 获取评论列表
+	commentList, err := dal.GetCommentList(*req.VideoId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, err.Error())
+		*resp.StatusCode = 1
+		*resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+	// 将评论列表转换为响应的评论列表
+	var comments []*comment.Comment
+	for _, com := range commentList {
+		// 获取用户信息
+		user, err := getUserInfo(com.UserId)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, err.Error())
+			*resp.StatusCode = 1
+			*resp.StatusMsg = err.Error()
+			c.JSON(consts.StatusOK, resp)
+			return
+		}
+		id := int64(com.ID)
+		createdAt := com.CreatedAt.Format("2006-01-02 15:04:05")
+		// 设置响应
+		comments = append(comments, &comment.Comment{
+			Id:         &id,
+			User:       user,
+			Content:    &com.Content,
+			CreateDate: &createdAt,
+		})
+	}
+	// 设置响应
+	*resp.StatusCode = 0
+	*resp.StatusMsg = "success"
+	resp.CommentList = append(resp.CommentList, comments...)
 	c.JSON(consts.StatusOK, resp)
 }

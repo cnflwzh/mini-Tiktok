@@ -21,31 +21,38 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req favorite.DouyinFavoriteActionRequest
 	err = c.BindAndValidate(&req)
+	resp := new(favorite.DouyinFavoriteActionResponse)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
+		*resp.StatusCode = 1
+		*resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusOK, resp)
 		return
 	}
 	// 判断当前用户是否已经点赞
 	isFavorite, err := dal.IsFavorite(*req.UserId, *req.VideoId)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
+		*resp.StatusCode = 1
+		*resp.StatusMsg = err.Error()
+		c.JSON(consts.StatusOK, resp)
 		return
 	}
-	resp := new(favorite.DouyinFavoriteActionResponse)
 	if err != nil {
 		c.String(consts.StatusBadRequest, "invalid token")
+		*resp.StatusCode = 1
+		*resp.StatusMsg = "invalid token"
+		c.JSON(consts.StatusOK, resp)
 		return
 	}
 	// 判断当前请求是否需要执行
 	if *req.ActionType == 1 && isFavorite {
-		*resp.StatusCode = 1
-		*resp.StatusMsg = "已经点过赞了"
-	}
-	if *req.ActionType == 2 && !isFavorite {
 		*resp.StatusCode = 2
+		*resp.StatusMsg = "已经点过赞了"
+	} else if *req.ActionType == 2 && !isFavorite {
+		*resp.StatusCode = 3
 		*resp.StatusMsg = "不能给未点赞的视频取消点赞"
-	}
-	if *req.ActionType == 1 && !isFavorite {
+	} else if *req.ActionType == 1 && !isFavorite {
 		// 添加点赞
 		err = dal.AddFavorite(*req.UserId, *req.VideoId)
 		if err != nil {
@@ -54,8 +61,7 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		}
 		*resp.StatusCode = 0
 		*resp.StatusMsg = "点赞成功"
-	}
-	if *req.ActionType == 2 && isFavorite {
+	} else if *req.ActionType == 2 && isFavorite {
 		// 取消点赞
 		err = dal.DeleteFavorite(*req.UserId, *req.VideoId)
 		if err != nil {
@@ -74,24 +80,25 @@ func List(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req favorite.DouyinFavoriteListRequest
 	err = c.BindAndValidate(&req)
+	resp := new(favorite.DouyinFavoriteListResponse)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
-		return
+		*resp.StatusCode = 1
 	}
 	// 获取点赞列表
 	favorites, err := dal.GetFavoriteList(*req.UserId)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, err.Error())
-		return
+		*resp.StatusCode = 1
 	}
-	resp := new(favorite.DouyinFavoriteListResponse)
 	// 从点赞列表中的视频 id 获取视频信息
 	videos := make([]video.Video, len(favorites))
 	for i, favorite := range favorites {
 		v, err := dal.GetVideo(favorite.VideoId)
 		if err != nil {
 			c.String(consts.StatusInternalServerError, err.Error())
-			return
+			*resp.StatusCode = 1
+			break
 		}
 		videos[i] = *v
 	}
@@ -103,28 +110,30 @@ func List(ctx context.Context, c *app.RequestContext) {
 			c.String(consts.StatusInternalServerError, err.Error())
 			return
 		}
+		followCount := int64(user.FollowCount)
+		workCount := int64(user.WorkCount)
+		favoriteCount := int64(user.FavoriteCount)
 		u := common.User{
-			Id:              &user.Id,
 			Name:            &user.Name,
-			FollowCount:     nil,
+			FollowCount:     &followCount,
 			FollowerCount:   &user.FollowerCount,
 			Avatar:          &user.Avater,
 			BackgroundImage: &user.BackgroundImage,
 			Signature:       &user.Signature,
 			TotalFavorited:  &user.TotalFavorited,
-			WorkCount:       nil,
-			FavoriteCount:   nil,
-			IsFollow:        nil, // 这里不需要关注信息
+			WorkCount:       &workCount,
+			FavoriteCount:   &favoriteCount,
+			IsFollow:        nil, // 等待查询用户是否关注的接口
 		}
+		isFavorite := true
 		commonVideos[i] = &common.Video{
-			Id: &v.Id,
 			// 这里用一个函数来获取视频作者信息
 			Author:        &u,
 			PlayUrl:       &v.PlayUrl,
 			CoverUrl:      &v.CoverUrl,
 			FavoriteCount: &v.FavoriteCount,
 			CommentCount:  &v.CommentCount,
-			IsFavorite:    nil, // 这里是肯定点过赞的
+			IsFavorite:    &isFavorite, // 这里是肯定点过赞的
 			Title:         &v.Title,
 		}
 	}

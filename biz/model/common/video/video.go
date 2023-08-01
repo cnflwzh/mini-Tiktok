@@ -1,6 +1,6 @@
 package video
 
-import "time"
+import "gorm.io/gorm"
 
 // DROP TABLE IF EXISTS `video_info`;
 // CREATE TABLE `video_info`  (
@@ -21,14 +21,11 @@ import "time"
 
 // model
 type Video struct {
-	Id            int64     `gorm:"primaryKey;column:id;type:bigint(20);not null" json:"id"`
-	UserId        int64     `gorm:"column:user_id;type:bigint(20);not null" json:"user_id"`
-	PlayUrl       string    `gorm:"column:play_url;type:varchar(300);not null" json:"play_url"`
-	CoverUrl      string    `gorm:"column:cover_url;type:varchar(300);not null" json:"cover_url"`
-	FavoriteCount int64     `gorm:"column:favorite_count;type:bigint(20);not null" json:"favorite_count"`
-	CommentCount  int64     `gorm:"column:comment_count;type:bigint(20);not null" json:"comment_count"`
-	Title         string    `gorm:"column:title;type:varchar(255);not null" json:"title"`
-	CreatedAt     time.Time `gorm:"column:created_at;type:datetime;not null" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"column:updated_at;type:datetime" json:"updated_at"`
-	DeletedAt     time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at"`
+	gorm.Model
+	UserId        int64  `gorm:"column:user_id;type:bigint(20);not null" json:"user_id"`
+	PlayUrl       string `gorm:"column:play_url;type:varchar(300);not null" json:"play_url"`
+	CoverUrl      string `gorm:"column:cover_url;type:varchar(300);not null" json:"cover_url"`
+	FavoriteCount int64  `gorm:"column:favorite_count;type:bigint(20);not null" json:"favorite_count"`
+	CommentCount  int64  `gorm:"column:comment_count;type:bigint(20);not null" json:"comment_count"`
+	Title         string `gorm:"column:title;type:varchar(255);not null" json:"title"`
 }

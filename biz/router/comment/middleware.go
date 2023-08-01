@@ -3,6 +3,8 @@
 package comment
 
 import (
+	JWT "mini-Tiktok/biz/middleware/jwt"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -18,7 +20,7 @@ func _douyinMw() []app.HandlerFunc {
 
 func _commentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return JWT.JWTAuthMiddleware()
 }
 
 func _commentactionMw() []app.HandlerFunc {

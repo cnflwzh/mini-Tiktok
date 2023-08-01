@@ -1,6 +1,6 @@
 package user
 
-import "time"
+import "gorm.io/gorm"
 
 // DROP TABLE IF EXISTS `user_profile`;
 // CREATE TABLE `user_profile`  (
@@ -22,17 +22,14 @@ import "time"
 
 // model
 type User struct {
-	Id              int64     `gorm:"primaryKey;column:id;type:bigint(20);not null" json:"id"`
-	Name            string    `gorm:"column:name;type:varchar(16);not null" json:"name"`
-	FollowCount     int       `gorm:"column:follow_count;type:int(11);not null" json:"follow_count"`
-	FollowerCount   int64     `gorm:"column:follower_count;type:bigint(20);not null" json:"follower_count"`
-	Avater          string    `gorm:"column:avater;type:varchar(300)" json:"avater"`
-	BackgroundImage string    `gorm:"column:background_image;type:varchar(300)" json:"background_image"`
-	Signature       string    `gorm:"column:signature;type:varchar(300)" json:"signature"`
-	TotalFavorited  int64     `gorm:"column:total_favorited;type:bigint(20);not null" json:"total_favorited"`
-	WorkCount       int       `gorm:"column:work_count;type:int(11);not null" json:"work_count"`
-	FavoriteCount   int       `gorm:"column:favorite_count;type:int(11);not null" json:"favorite_count"`
-	CreatedAt       time.Time `gorm:"column:created_at;type:datetime;not null" json:"created_at"`
-	UpdatedAt       time.Time `gorm:"column:updated_at;type:datetime" json:"updated_at"`
-	DeletedAt       time.Time `gorm:"column:deleted_at;type:datetime" json:"deleted_at"`
+	gorm.Model
+	Name            string `gorm:"column:name;type:varchar(16);not null" json:"name"`
+	FollowCount     int    `gorm:"column:follow_count;type:int(11);not null" json:"follow_count"`
+	FollowerCount   int64  `gorm:"column:follower_count;type:bigint(20);not null" json:"follower_count"`
+	Avater          string `gorm:"column:avater;type:varchar(300)" json:"avater"`
+	BackgroundImage string `gorm:"column:background_image;type:varchar(300)" json:"background_image"`
+	Signature       string `gorm:"column:signature;type:varchar(300)" json:"signature"`
+	TotalFavorited  int64  `gorm:"column:total_favorited;type:bigint(20);not null" json:"total_favorited"`
+	WorkCount       int    `gorm:"column:work_count;type:int(11);not null" json:"work_count"`
+	FavoriteCount   int    `gorm:"column:favorite_count;type:int(11);not null" json:"favorite_count"`
 }
