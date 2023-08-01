@@ -3,11 +3,8 @@
 package relation
 
 import (
-	"context"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	relation "mini-Tiktok/biz/model/social/relation"
-	"mini-Tiktok/middleware"
+	"mini-Tiktok/biz/middleware/jwt"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -36,14 +33,15 @@ func _followMw() []app.HandlerFunc {
 }
 
 func _relationfollowlistMw() []app.HandlerFunc {
-	return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
-		var req relation.DouyinRelationFollowListRequest
-		_, err := middleware.ParseToken(req.GetToken())
-		if err != nil {
-			ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
-			return
-		}
-	}}
+	//return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
+	//	var req relation.DouyinRelationFollowListRequest
+	//	_, err := jwt.ParseToken(strconv.FormatInt(req.GetToken(), 10))
+	//	if err != nil {
+	//		ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
+	//		return
+	//	}
+	//}}
+	return jwt.JWTAuthMiddleware()
 }
 
 func _followerMw() []app.HandlerFunc {
@@ -53,7 +51,15 @@ func _followerMw() []app.HandlerFunc {
 
 func _relationfollowerlistMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	//return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
+	//	var req relation.DouyinRelationFollowListRequest
+	//	_, err := jwt.ParseToken(strconv.FormatInt(req.GetToken(), 10))
+	//	if err != nil {
+	//		ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
+	//		return
+	//	}
+	//}}
+	return jwt.JWTAuthMiddleware()
 }
 
 func _friendMw() []app.HandlerFunc {
