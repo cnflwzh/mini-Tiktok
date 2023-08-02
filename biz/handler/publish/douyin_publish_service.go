@@ -4,8 +4,8 @@ package publish
 
 import (
 	"context"
-
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	publish "mini-Tiktok/biz/model/publish"
 )
@@ -20,6 +20,30 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+	file, err := c.FormFile("data")
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+	hlog.Info("file: ", file.Filename)
+
+	/**
+	处理流程：
+	1、服务端收到请求
+	2、生成封面图
+	3、上传视频
+	4、上传封面图
+	5、获取视频链接和封面图链接
+	6、将视频完整信息存入数据库
+	*/
+	//videoUrl, coverUrl, err := utils.VideoUploadToKodo(file, *req.UserId)
+	//if err != nil {
+	//	c.String(consts.StatusBadRequest, err.Error())
+	//	return
+	//}
+	//// 将视频信息存入数据库
+	//hlog.Info("videoUrl: ", videoUrl)
+	//hlog.Info("coverUrl: ", coverUrl)
 
 	resp := new(publish.DouyinPublishActionResponse)
 

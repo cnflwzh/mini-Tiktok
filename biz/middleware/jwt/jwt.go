@@ -74,6 +74,14 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 		func(ctx context.Context, c *app.RequestContext) {
 			// 从请求头中获取Token
 			tokenString, ok := c.Get("token")
+			if tokenString == nil {
+				tokenString = string(c.FormValue("token"))
+				if tokenString != nil {
+					ok = true
+				} else {
+					ok = false
+				}
+			}
 			if !ok {
 				hlog.Error("Get Token from header fail")
 				c.AbortWithStatus(401)

@@ -1,3 +1,10 @@
 [database]
 # todo： 等服务器部署后，修改此行
 mysql_dsn = "gorm:gorm@tcp(localhost:9910)/gorm?charset=utf8&parseTime=True&loc=Local"
+
+[kodo]
+access_key="Gf3aoO3pRRMxRYw5VAdQ9Oq0A_HDREpvt4qcxZuy"
+secret_key="WCiWwiKzUyMgADUNirCwwyuDal5Y0sX6v8IATeFL"
+bucket= "2568douyin"
+domain= "http://ryi1c8rs5.hn-bkt.clouddn.com"
+return_url= "http://localhost:8080/api/v1/upload/callback"

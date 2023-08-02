@@ -4,6 +4,7 @@ package publish
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"mini-Tiktok/biz/middleware/jwt"
 )
 
 func rootMw() []app.HandlerFunc {
@@ -18,7 +19,7 @@ func _douyinMw() []app.HandlerFunc {
 
 func _publishMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return jwt.JWTAuthMiddleware()
 }
 
 func _publishactionMw() []app.HandlerFunc {
