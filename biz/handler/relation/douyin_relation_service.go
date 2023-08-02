@@ -24,6 +24,15 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationActionResponse)
+	err = mysql.Follow(req.GetUserId(), req.GetToUserId())
+	if err != nil {
+		*resp.StatusCode = int32(-1)
+		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "关注或取关用户" + strconv.FormatInt(req.GetToUserId(), 10) + "失败"
+		c.JSON(consts.StatusOK, resp)
+		return
+	}
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "关注或取关用户" + strconv.FormatInt(req.GetToUserId(), 10) + "成功"
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -40,12 +49,16 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowListResponse)
-	*resp.StatusCode = int32(0)
-	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览关注列表"
+
 	resp.UserList, err = mysql.GetFollowList(req.GetUserId())
 	if err != nil {
-		panic(err)
+		*resp.StatusCode = int32(-1)
+		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "浏览关注列表失败"
+		c.JSON(consts.StatusOK, resp)
+		return
 	}
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览关注列表"
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -62,12 +75,15 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowerListResponse)
-	*resp.StatusCode = int32(0)
-	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览粉丝列表"
 	resp.UserList, err = mysql.GetFollowerList(req.GetUserId())
 	if err != nil {
-		panic(err)
+		*resp.StatusCode = int32(-1)
+		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "浏览粉丝列表失败"
+		c.JSON(consts.StatusOK, resp)
+		return
 	}
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览粉丝列表"
 
 	c.JSON(consts.StatusOK, resp)
 }
