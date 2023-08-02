@@ -12,6 +12,9 @@ func GetFollowList(userId int64) ([]*common.User, error) {
 	var requiredUsers []*common.User // 标准用户列表
 	var followIds []int64            // 用户关注id列表
 	err = DB.Model(&relation.Follow{}).Select("follow_id").Where("user_id = ?", userId).Find(&followIds).Error
+	if err != nil {
+		return nil, err // 这一块的错误处理可以再看一下，我这边是直接返回了不知道会不会有问题
+	}
 	err = DB.Model(&user.User{}).Where("user_id in (?)", followIds).Find(&users).Error
 	for i := 0; i < len(users); i++ {
 		var isFollow bool
@@ -22,8 +25,9 @@ func GetFollowList(userId int64) ([]*common.User, error) {
 		} else {
 			isFollow = true
 		}
+		id := int64(users[i].Model.ID)
 		requiredUsers[i] = &common.User{
-			Id:              &users[i].Id,
+			Id:              &id,
 			Name:            &users[i].Name,
 			FollowCount:     nil,
 			FollowerCount:   &users[i].FollowerCount,
@@ -47,6 +51,9 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 	var requiredUsers []*common.User // 标准用户列表
 	var followerIds []int64          // 用户关注id列表
 	err = DB.Model(&relation.Follow{}).Select("user_id").Where("follow_id = ?", userId).Find(&followerIds).Error
+	if err != nil {
+		return nil, err // 这一块的错误处理也可以再看一下
+	}
 	err = DB.Model(&user.User{}).Where("user_id in (?)", followerIds).Find(&users).Error
 	for i := 0; i < len(users); i++ {
 		var isFollow bool
@@ -57,8 +64,9 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 		} else {
 			isFollow = true
 		}
+		id := int64(users[i].Model.ID)
 		requiredUsers[i] = &common.User{
-			Id:              &users[i].Id,
+			Id:              &id,
 			Name:            &users[i].Name,
 			FollowCount:     nil,
 			FollowerCount:   &users[i].FollowerCount,
