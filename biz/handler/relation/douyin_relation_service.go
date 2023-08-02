@@ -4,6 +4,8 @@ package relation
 
 import (
 	"context"
+	"mini-Tiktok/biz/dal/mysql"
+	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -38,6 +40,12 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowListResponse)
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览关注列表"
+	resp.UserList, err = mysql.GetFollowList(req.GetUserId())
+	if err != nil {
+		panic(err)
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -54,6 +62,12 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowerListResponse)
+	*resp.StatusCode = int32(0)
+	*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "正在浏览粉丝列表"
+	resp.UserList, err = mysql.GetFollowerList(req.GetUserId())
+	if err != nil {
+		panic(err)
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
