@@ -29,3 +29,7 @@ type Video struct {
 	CommentCount  int64  `gorm:"column:comment_count;type:bigint(20);not null" json:"comment_count"`
 	Title         string `gorm:"column:title;type:varchar(255);not null" json:"title"`
 }
+
+func (Video) TableName() string {
+	return "video_info"
+}

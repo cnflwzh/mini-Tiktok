@@ -4,6 +4,10 @@ package user
 
 import (
 	"context"
+	"github.com/golang/protobuf/proto"
+	"mini-Tiktok/biz/dal/mysql"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -37,7 +41,49 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(user.DouyinUserLoginResponse)
+	resp := &user.DouyinUserRegisterResponse{
+		StatusCode: proto.Int32(0),
+		StatusMsg:  proto.String(""),
+		UserId:     proto.Int64(0),
+		Token:      proto.String(""),
+	}
+	username := req.GetUsername()
+	password := req.GetPassword()
+	//判断用户名和密码是否为空
+	if username == "" || password == "" {
+		sendErrorResponse(c, 10001, "用户名或密码为空")
+		return
+	}
+	//去除用户名和密码的空格
+	username = utils.TrimSpace(username)
+	password = utils.TrimSpace(password)
+	//查询用户密码
+	credential, userId, err := mysql.GetUserCredential(username)
+	if credential == "" {
+		sendErrorResponse(c, 10002, "用户不存在")
+		return
+	}
+	if err != nil {
+		sendErrorResponse(c, 10003, err.Error())
+		return
+	}
+	//判断密码是否正确
+	hash := utils.CheckPasswordHash(password, credential)
+	if !hash {
+		sendErrorResponse(c, 10004, "密码错误")
+		return
+	}
+	//生成token
+	token, err := jwt.GenerateToken(username, userId)
+	if err != nil {
+		sendErrorResponse(c, 10005, err.Error())
+		return
+	}
+
+	*resp.StatusCode = 0
+	*resp.StatusMsg = "登录成功"
+	*resp.UserId = int64(userId)
+	*resp.Token = token
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -49,11 +95,73 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.DouyinUserRegisterRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		sendErrorResponse(c, consts.StatusBadRequest, err.Error())
+		return
+	}
+	resp := &user.DouyinUserRegisterResponse{
+		StatusCode: proto.Int32(0),
+		StatusMsg:  proto.String(""),
+		UserId:     proto.Int64(0),
+		Token:      proto.String(""),
+	}
+
+	username := *req.Username
+	password := *req.Password
+	//判断用户名和密码是否为空
+	if username == "" || password == "" {
+		sendErrorResponse(c, 11001, "用户名或密码为空")
+		return
+	}
+	//去除用户名和密码的空格
+	username = utils.TrimSpace(username)
+	password = utils.TrimSpace(password)
+	//判断用户名和密码是否包含非法字符
+	if !utils.CheckUsername(username) || !utils.CheckPassword(password) {
+		sendErrorResponse(c, 11007, "用户名或密码不满足要求")
+		return
+	}
+	//判断用户名是否已经存在
+	exist := mysql.CheckUserExist(username)
+	if exist {
+		sendErrorResponse(c, 11002, "用户名已存在")
+		return
+	}
+	//获取密码加盐哈希
+	passwordHash, err := utils.HashPassword(password)
+	if err != nil {
+		sendErrorResponse(c, 11003, err.Error())
+		return
+	}
+	//插入数据库
+	//1、在用户信息表中插入
+	userId, err := mysql.AddUser(username)
+	if err != nil {
+		sendErrorResponse(c, 11004, err.Error())
+		return
+	}
+	//2、在用户凭证表中插入
+	err = mysql.AddUserCredential(username, passwordHash, int(userId))
+	if err != nil {
+		sendErrorResponse(c, 11005, err.Error())
+		return
+	}
+	token, err := jwt.GenerateToken(username, int(userId))
+	if err != nil {
+		sendErrorResponse(c, 11006, err.Error())
 		return
 	}
 
-	resp := new(user.DouyinUserRegisterResponse)
+	*resp.StatusCode = 0
+	*resp.StatusMsg = "注册成功"
+	*resp.UserId = int64(userId)
+	*resp.Token = token
+	c.JSON(consts.StatusOK, resp)
+}
 
+func sendErrorResponse(c *app.RequestContext, statusCode int32, message string) {
+	resp := &user.DouyinUserRegisterResponse{
+		StatusCode: proto.Int32(statusCode),
+		StatusMsg:  proto.String(message),
+	}
 	c.JSON(consts.StatusOK, resp)
 }
