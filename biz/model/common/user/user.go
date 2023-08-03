@@ -33,3 +33,7 @@ type User struct {
 	WorkCount       int    `gorm:"column:work_count;type:int(11);not null" json:"work_count"`
 	FavoriteCount   int    `gorm:"column:favorite_count;type:int(11);not null" json:"favorite_count"`
 }
+
+func (User) TableName() string {
+	return "user_profile"
+}

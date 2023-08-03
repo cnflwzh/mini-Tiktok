@@ -24,7 +24,7 @@ func _relationMw() []app.HandlerFunc {
 
 func _relationactionMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return jwt.JWTAuthMiddleware()
 }
 
 func _followMw() []app.HandlerFunc {

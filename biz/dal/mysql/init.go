@@ -16,7 +16,7 @@ var (
 var dsn = conf.Dsn
 
 // Init initializes the DB instance.
-func Init() {
+func init() {
 	var err error
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		SkipDefaultTransaction: true,
