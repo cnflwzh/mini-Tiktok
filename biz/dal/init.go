@@ -1,9 +1,5 @@
 package dal
 
-import (
-	"mini-Tiktok/biz/dal/mysql"
-)
-
-func Init() {
-	mysql.Init()
+func init() {
+	//mysql.init()
 }

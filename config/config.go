@@ -8,11 +8,11 @@ var (
 	Dsn string
 )
 
-// Init initializes the config.
-func Init() {
+// init initializes the config.
+func init() {
 	Config := viper.New()
 	Config.SetConfigName("config")
-	Config.SetConfigFile("./config.toml")
+	Config.SetConfigFile("config/config.toml")
 	err := Config.ReadInConfig()
 	if err != nil {
 		panic(err)
