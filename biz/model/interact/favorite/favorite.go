@@ -15,3 +15,7 @@ type Favorite struct {
 	UserId  int64 `gorm:"primaryKey;column:user_id;type:bigint(20);not null" json:"user_id"`
 	VideoId int64 `gorm:"primaryKey;column:video_id;type:bigint(20);not null" json:"video_id"`
 }
+
+func (Favorite) TableName() string {
+	return "video_user_like"
+}
