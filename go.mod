@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/cloudwego/hertz v0.6.6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/golang/protobuf v1.5.3
 	github.com/spf13/viper v1.16.0
 	golang.org/x/crypto v0.11.0
 	google.golang.org/protobuf v1.31.0
@@ -20,7 +21,6 @@ require (
 	github.com/cloudwego/netpoll v0.3.2 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
