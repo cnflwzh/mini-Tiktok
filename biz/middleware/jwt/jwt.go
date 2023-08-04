@@ -72,15 +72,17 @@ func ParseToken(tokenString string) (int, error) {
 func JWTAuthMiddleware() []app.HandlerFunc {
 	return []app.HandlerFunc{
 		func(ctx context.Context, c *app.RequestContext) {
-			// 从请求头中获取Token
-			tokenString, ok := c.Get("token")
-			if !ok {
-				hlog.Error("Get Token from header fail")
+			// 从请求中获取Token
+			token := c.QueryArgs().Peek("token")
+			if token == nil {
+				hlog.Error("Get Token Fail")
 				c.AbortWithStatus(401)
 				return
 			}
+			// 将Token转换为字符串
+			tokenString := string(token)
 			// 解析Token
-			userID, err := ParseToken(tokenString.(string))
+			userID, err := ParseToken(tokenString)
 			if err != nil {
 				hlog.Error("Parse Token Fail:", err)
 				c.AbortWithStatus(401)
@@ -88,6 +90,8 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 			}
 			// 将用户ID存入上下文
 			c.Set("userID", userID)
+			// 将token从上下文中删除
+			c.Set("token", nil)
 			c.Next(ctx)
 		}}
 }
