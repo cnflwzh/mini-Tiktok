@@ -21,44 +21,44 @@ func Action(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req favorite.DouyinFavoriteActionRequest
 	err = c.BindAndValidate(&req)
-	resp := new(favorite.DouyinFavoriteActionResponse)
+	//resp := new(favorite.DouyinFavoriteActionResponse)
 	if err != nil {
-		sendErrorResponse(c, 1, err.Error())
+		sendResponse(c, 1, err.Error())
 		return
 	}
 	// 判断当前用户是否已经点赞
 	isFavorite, err := dal.IsFavorite(*req.UserId, *req.VideoId)
 	if err != nil {
-		sendErrorResponse(c, 1, err.Error())
+		sendResponse(c, 1, err.Error())
 		return
 	}
 	if err != nil {
-		sendErrorResponse(c, 1, err.Error())
+		sendResponse(c, 1, err.Error())
 		return
 	}
 	// 判断当前请求是否需要执行
 	if *req.ActionType == 1 && isFavorite {
-		sendErrorResponse(c, 2, "不能重复点赞")
+		sendResponse(c, 2, "不能重复点赞")
 	} else if *req.ActionType == 2 && !isFavorite {
-		sendErrorResponse(c, 3, "不能取消未点赞的视频")
+		sendResponse(c, 3, "不能取消未点赞的视频")
 	} else if *req.ActionType == 1 && !isFavorite {
 		// 添加点赞
 		err = dal.AddFavorite(*req.UserId, *req.VideoId)
 		if err != nil {
-			sendErrorResponse(c, 4, err.Error())
+			sendResponse(c, 4, err.Error())
 			return
 		}
-		sendErrorResponse(c, 0, "点赞成功")
+		sendResponse(c, 0, "点赞成功")
+
 	} else if *req.ActionType == 2 && isFavorite {
 		// 取消点赞
 		err = dal.DeleteFavorite(*req.UserId, *req.VideoId)
 		if err != nil {
-			sendErrorResponse(c, 5, err.Error())
+			sendResponse(c, 5, err.Error())
 			return
 		}
-		sendErrorResponse(c, 0, "取消点赞成功")
+		sendResponse(c, 0, "取消点赞成功")
 	}
-	c.JSON(consts.StatusOK, resp)
 }
 
 // List .
@@ -68,14 +68,15 @@ func List(ctx context.Context, c *app.RequestContext) {
 	var req favorite.DouyinFavoriteListRequest
 	err = c.BindAndValidate(&req)
 	resp := new(favorite.DouyinFavoriteListResponse)
+	resp.VideoList = make([]*common.Video, 0)
 	if err != nil {
-		sendErrorResponse(c, 1, err.Error())
+		sendResponse(c, 1, err.Error())
 		return
 	}
 	// 获取点赞列表
 	favorites, err := dal.GetFavoriteList(*req.UserId)
 	if err != nil {
-		sendErrorResponse(c, 1, err.Error())
+		sendResponse(c, 1, err.Error())
 		return
 	}
 	// 获取点赞视频列表
@@ -84,7 +85,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 		// 获取视频信息
 		videoInfo, err := utils.GetVideoInfoFromDb(favorite.VideoId)
 		if err != nil {
-			sendErrorResponse(c, 1, err.Error())
+			sendResponse(c, 1, err.Error())
 			return
 		}
 		commonVideos = append(commonVideos, videoInfo)
@@ -93,7 +94,7 @@ func List(ctx context.Context, c *app.RequestContext) {
 	c.JSON(consts.StatusOK, resp)
 }
 
-func sendErrorResponse(c *app.RequestContext, code int32, msg string) {
+func sendResponse(c *app.RequestContext, code int32, msg string) {
 	resp := &favorite.DouyinFavoriteActionResponse{
 		StatusCode: &code,
 		StatusMsg:  &msg,

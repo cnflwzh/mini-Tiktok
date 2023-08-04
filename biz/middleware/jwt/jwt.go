@@ -81,6 +81,7 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 			}
 			// 将Token转换为字符串
 			tokenString := string(token)
+			hlog.Info("Get Token:", tokenString)
 			// 解析Token
 			userID, err := ParseToken(tokenString)
 			if err != nil {
@@ -88,10 +89,10 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 				c.AbortWithStatus(401)
 				return
 			}
-			// 将用户ID存入上下文
-			c.Set("userID", userID)
-			// 将token从上下文中删除
-			c.Set("token", nil)
+			// 将用户ID存入params
+			c.Request.SetQueryString(fmt.Sprintf("user_id=%d&", userID) + string(c.Request.QueryString()))
+			// 看一下params
+			hlog.Info("Params:", string(c.Request.QueryString()))
 			c.Next(ctx)
 		}}
 }
