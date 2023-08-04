@@ -60,15 +60,20 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		sendErrorResponse(c, 5, err.Error())
 		return
 	}
-	// 设置响应
-	*resp.StatusCode = 0
-	*resp.StatusMsg = "success"
-	*resp.Comment = comment.Comment{
-		Id:         &comID,
-		User:       user,
-		Content:    req.CommentText,
-		CreateDate: &createTime,
+	// 设置响应,这里不知道为什么内存会泄漏，所以这里直接使用了new
+	statusCode := int32(0)
+	statusMsg := "success"
+	resp = &comment.DouyinCommentActionResponse{
+		StatusCode: &statusCode,
+		StatusMsg:  &statusMsg,
+		Comment: &comment.Comment{
+			Id:         &comID,
+			User:       user,
+			Content:    req.CommentText,
+			CreateDate: &createTime,
+		},
 	}
+
 	c.JSON(consts.StatusOK, resp)
 }
 

@@ -65,6 +65,7 @@ func GetFollowList(userId int64) ([]*common.User, error) {
 			isFollow = true
 		}
 		id := int64(users[i].Model.ID)
+		totalFav := string(rune(users[i].TotalFavorited))
 		requiredUsers[i] = &common.User{
 			Id:              &id,
 			Name:            &users[i].Name,
@@ -74,7 +75,7 @@ func GetFollowList(userId int64) ([]*common.User, error) {
 			Avatar:          &users[i].Avater,
 			BackgroundImage: &users[i].BackgroundImage,
 			Signature:       &users[i].Signature,
-			TotalFavorited:  &users[i].TotalFavorited,
+			TotalFavorited:  &totalFav,
 			WorkCount:       nil,
 			FavoriteCount:   nil,
 		}
@@ -104,6 +105,7 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 			isFollow = true
 		}
 		id := int64(users[i].Model.ID)
+		totalFav := string(rune(users[i].TotalFavorited))
 		requiredUsers[i] = &common.User{
 			Id:              &id,
 			Name:            &users[i].Name,
@@ -113,7 +115,7 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 			Avatar:          &users[i].Avater,
 			BackgroundImage: &users[i].BackgroundImage,
 			Signature:       &users[i].Signature,
-			TotalFavorited:  &users[i].TotalFavorited,
+			TotalFavorited:  &totalFav,
 			WorkCount:       nil,
 			FavoriteCount:   nil,
 		}

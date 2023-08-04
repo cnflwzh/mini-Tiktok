@@ -18,6 +18,7 @@ func GetUserInfoFromDb(userID int64) (*common.User, error) {
 	workCount := int64(userInfo.WorkCount)
 	favoriteCount := int64(userInfo.FavoriteCount)
 	uId := int64(userInfo.ID)
+	totalFav := string(rune(userInfo.TotalFavorited))
 	user := common.User{
 		Id:              &uId,
 		Name:            &userInfo.Name,
@@ -25,7 +26,7 @@ func GetUserInfoFromDb(userID int64) (*common.User, error) {
 		FollowerCount:   &userInfo.FollowerCount,
 		BackgroundImage: &userInfo.BackgroundImage,
 		Signature:       &userInfo.Signature,
-		TotalFavorited:  &userInfo.TotalFavorited,
+		TotalFavorited:  &totalFav,
 		WorkCount:       &workCount,
 		FavoriteCount:   &favoriteCount,
 		Avatar:          &userInfo.Avater,
@@ -44,33 +45,15 @@ func GetVideoInfoFromDb(videoID int64) (*common.Video, error) {
 		return nil, err
 	}
 	// 获取视频作者信息
-	userInfo, err := dal.GetUserById(videoInfo.UserId)
+	user, err := GetUserInfoFromDb(videoInfo.UserId)
 	if err != nil {
 		return nil, err
-	}
-	// 设置用户信息
-	followCount := int64(userInfo.FollowCount)
-	workCount := int64(userInfo.WorkCount)
-	favoriteCount := int64(userInfo.FavoriteCount)
-	uId := int64(userInfo.ID)
-	user := common.User{
-		Id:              &uId,
-		Name:            &userInfo.Name,
-		FollowCount:     &followCount,
-		FollowerCount:   &userInfo.FollowerCount,
-		BackgroundImage: &userInfo.BackgroundImage,
-		Signature:       &userInfo.Signature,
-		TotalFavorited:  &userInfo.TotalFavorited,
-		WorkCount:       &workCount,
-		FavoriteCount:   &favoriteCount,
-		Avatar:          &userInfo.Avater,
-		IsFollow:        nil, // 这里不进行设置
 	}
 	// 设置视频信息
 	vId := int64(videoInfo.ID)
 	video := common.Video{
 		Id:            &vId,
-		Author:        &user,
+		Author:        user,
 		PlayUrl:       &videoInfo.PlayUrl,
 		CoverUrl:      &videoInfo.CoverUrl,
 		FavoriteCount: &videoInfo.FavoriteCount,
