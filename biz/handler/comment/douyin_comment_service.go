@@ -87,7 +87,6 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-	resp := new(comment.DouyinCommentListResponse)
 	// 获取评论列表
 	commentList, err := dal.GetCommentList(*req.VideoId)
 	if err != nil {
@@ -114,9 +113,13 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		})
 	}
 	// 设置响应
-	*resp.StatusCode = 0
-	*resp.StatusMsg = "success"
-	resp.CommentList = append(resp.CommentList, comments...)
+	statusCode := int32(0)
+	statusMsg := "success"
+	resp := &comment.DouyinCommentListResponse{
+		StatusCode:  &statusCode,
+		StatusMsg:   &statusMsg,
+		CommentList: comments,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
