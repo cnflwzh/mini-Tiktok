@@ -90,7 +90,14 @@ func List(ctx context.Context, c *app.RequestContext) {
 		}
 		commonVideos = append(commonVideos, videoInfo)
 	}
-	resp.VideoList = append(resp.VideoList, commonVideos...)
+	// 设置响应
+	statusCode := int32(0)
+	statusMsg := "success"
+	resp = &favorite.DouyinFavoriteListResponse{
+		StatusCode: &statusCode,
+		StatusMsg:  &statusMsg,
+		VideoList:  commonVideos,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
 
