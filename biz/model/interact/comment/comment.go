@@ -24,3 +24,7 @@ type CommentTable struct {
 	UserId  int64  `gorm:"column:user_id;not null;comment:'用户id'" json:"user_id"`
 	Content string `gorm:"column:content;not null;type:varchar(1500);comment:'评论内容'" json:"content"`
 }
+
+func (CommentTable) TableName() string {
+	return "video_comment"
+}
