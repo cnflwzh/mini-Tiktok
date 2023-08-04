@@ -20,7 +20,7 @@ type Kodo struct {
 func init() {
 	Config := viper.New()
 	Config.SetConfigName("config")
-	Config.SetConfigFile("config/config-dev.toml")
+	Config.SetConfigFile("config/config.toml")
 	err := Config.ReadInConfig()
 	if err != nil {
 		panic(err)
