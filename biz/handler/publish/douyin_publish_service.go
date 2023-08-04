@@ -26,6 +26,7 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	hlog.Info("file: ", file.Filename)
+	c.FormValue("user_id")
 
 	/**
 	处理流程：
