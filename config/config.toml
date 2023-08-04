@@ -6,4 +6,4 @@ mysql_dsn = "root:2568@tcp(127.0.0.1:25681)/douyin?charset=utf8&parseTime=True&l
 access_key=""
 secret_key=""
 bucket= ""
-domain= "http://ryi1c8rs5.hn-bkt.clouddn.com"
+domain= ""
