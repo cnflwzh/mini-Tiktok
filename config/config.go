@@ -13,8 +13,7 @@ type Kodo struct {
 	AccessKey string
 	SecretKey string
 	Bucket    string
-	domain    string
-	returnUrl string
+	Domain    string
 }
 
 // init initializes the config.
@@ -30,6 +29,5 @@ func init() {
 	KodoConfig.AccessKey = Config.GetString("kodo.access_key")
 	KodoConfig.SecretKey = Config.GetString("kodo.secret_key")
 	KodoConfig.Bucket = Config.GetString("kodo.bucket")
-	KodoConfig.domain = Config.GetString("kodo.domain")
-	KodoConfig.returnUrl = Config.GetString("kodo.return_url")
+	KodoConfig.Domain = Config.GetString("kodo.domain")
 }
