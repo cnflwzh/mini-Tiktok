@@ -1,6 +1,4 @@
-package video
-
-import "gorm.io/gorm"
+package entity
 
 // DROP TABLE IF EXISTS `video_info`;
 // CREATE TABLE `video_info`  (
@@ -19,9 +17,9 @@ import "gorm.io/gorm"
 //   CONSTRAINT `fk_video_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 // ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '视频信息表' ROW_FORMAT = Dynamic;
 
-// model
+// Video 对应数据库表 video_info
 type Video struct {
-	gorm.Model
+	Model
 	UserId        int64  `gorm:"column:user_id;type:bigint(20);not null" json:"user_id"`
 	PlayUrl       string `gorm:"column:play_url;type:varchar(300);not null" json:"play_url"`
 	CoverUrl      string `gorm:"column:cover_url;type:varchar(300);not null" json:"cover_url"`

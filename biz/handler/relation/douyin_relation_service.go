@@ -4,12 +4,12 @@ package relation
 
 import (
 	"context"
-	"mini-Tiktok/biz/dal/mysql"
+	"mini-Tiktok/biz/repository"
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	relation "mini-Tiktok/biz/model/social/relation"
+	"mini-Tiktok/biz/model/social/relation"
 )
 
 // RelationAction .
@@ -24,7 +24,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationActionResponse)
-	err = mysql.Follow(req.GetUserId(), req.GetToUserId())
+	err = repository.Follow(req.GetUserId(), req.GetToUserId())
 	if err != nil {
 		*resp.StatusCode = int32(-1)
 		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "关注或取关用户" + strconv.FormatInt(req.GetToUserId(), 10) + "失败"
@@ -50,7 +50,7 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(relation.DouyinRelationFollowListResponse)
 
-	resp.UserList, err = mysql.GetFollowList(req.GetUserId())
+	resp.UserList, err = repository.GetFollowList(req.GetUserId())
 	if err != nil {
 		*resp.StatusCode = int32(-1)
 		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "浏览关注列表失败"
@@ -75,7 +75,7 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(relation.DouyinRelationFollowerListResponse)
-	resp.UserList, err = mysql.GetFollowerList(req.GetUserId())
+	resp.UserList, err = repository.GetFollowerList(req.GetUserId())
 	if err != nil {
 		*resp.StatusCode = int32(-1)
 		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "浏览粉丝列表失败"

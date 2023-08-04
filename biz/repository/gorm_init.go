@@ -1,4 +1,4 @@
-package mysql
+package repository
 
 import (
 	conf "mini-Tiktok/config"

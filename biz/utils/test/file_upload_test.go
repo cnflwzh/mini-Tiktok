@@ -1,7 +1,8 @@
-package utils
+package test
 
 import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"mini-Tiktok/biz/utils"
 	"os"
 	"testing"
 )
@@ -13,7 +14,7 @@ func TestVideoUploadToKodo(t *testing.T) {
 		t.Errorf("Error reading file: %v", err)
 		return
 	}
-	url, coverUrl, err := VideoUploadToKodo(file, 2234)
+	url, coverUrl, err := utils.VideoUploadToKodo(file, 2234)
 	if err != nil {
 		t.Errorf("Error uploading video: %v", err)
 		return

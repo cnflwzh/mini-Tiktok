@@ -4,9 +4,9 @@ package comment
 
 import (
 	"context"
+	dal "mini-Tiktok/biz/repository"
 
-	dal "mini-Tiktok/biz/dal/mysql"
-	comment "mini-Tiktok/biz/model/interact/comment"
+	"mini-Tiktok/biz/model/interact/comment"
 	"mini-Tiktok/biz/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"

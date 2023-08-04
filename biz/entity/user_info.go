@@ -1,6 +1,4 @@
-package user
-
-import "gorm.io/gorm"
+package entity
 
 // DROP TABLE IF EXISTS `user_profile`;
 // CREATE TABLE `user_profile`  (
@@ -22,7 +20,7 @@ import "gorm.io/gorm"
 
 // model
 type User struct {
-	gorm.Model
+	Model
 	Name            string `gorm:"column:name;type:varchar(16);not null" json:"name"`
 	FollowCount     int    `gorm:"column:follow_count;type:int(11);not null" json:"follow_count"`
 	FollowerCount   int64  `gorm:"column:follower_count;type:bigint(20);not null" json:"follower_count"`

@@ -1,11 +1,11 @@
-package mysql
+package repository
 
 import (
-	"mini-Tiktok/biz/model/common/credential"
+	"mini-Tiktok/biz/entity"
 )
 
 func CheckUserExist(username string) bool {
-	var userCredential credential.Credentials
+	var userCredential entity.Credentials
 	err := DB.Where("username = ?", username).First(&userCredential).Error
 	if err != nil {
 		return false
@@ -13,8 +13,8 @@ func CheckUserExist(username string) bool {
 	return true
 }
 
-func AddUserCredential(username string, password string, userId int) error {
-	userCredential := credential.Credentials{
+func AddUserCredential(username string, password string, userId int64) error {
+	userCredential := entity.Credentials{
 		Username: username,
 		Password: password,
 		UserId:   userId,
@@ -26,8 +26,8 @@ func AddUserCredential(username string, password string, userId int) error {
 	return nil
 }
 
-func GetUserCredential(username string) (string, int, error) {
-	var userCredential credential.Credentials
+func GetUserCredential(username string) (string, int64, error) {
+	var userCredential entity.Credentials
 	err := DB.Where("username = ?", username).First(&userCredential).Error
 	if err != nil {
 		return "", -1, err

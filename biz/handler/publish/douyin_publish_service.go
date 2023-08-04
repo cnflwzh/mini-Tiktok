@@ -7,46 +7,52 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	publish "mini-Tiktok/biz/model/publish"
+	"google.golang.org/protobuf/proto"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/model/publish"
+	"mini-Tiktok/biz/repository"
+	"mini-Tiktok/biz/utils"
 )
 
 // PublishAction .
 // @router /douyin/publish/action [POST]
 func PublishAction(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req publish.DouyinPublishActionRequest
-	err = c.BindAndValidate(&req)
+	formFile, err := c.FormFile("data")
+	token := c.FormValue("token")
+	title := c.FormValue("title")
+	file, err := utils.ReadFile(formFile)
+
+	userId, err := jwt.ParseToken(string(token))
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.SendErrorResponse(c, 20001, "token 解析失败")
+		hlog.Error("token 解析失败", err)
+	}
+	isMP4Video := utils.IsMp4Video(file)
+	if !isMP4Video {
+		utils.SendErrorResponse(c, 20002, "上传的视频格式不是 MP4")
+		hlog.Error("上传的视频格式不是 MP4", err)
 		return
 	}
-	file, err := c.FormFile("data")
+	videoUrl, coverUrl, err := utils.VideoUploadToKodo(file, userId)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.SendErrorResponse(c, 20003, "上传视频失败")
+		hlog.Error("上传视频失败", err)
 		return
 	}
-	hlog.Info("file: ", file.Filename)
-	c.FormValue("user_id")
+	_, err = repository.AddVideo(userId, videoUrl, coverUrl, string(title))
+	if err != nil {
+		utils.SendErrorResponse(c, 20004, "数据库返回错误")
+		hlog.Error("数据库出错", err)
+		return
+	}
 
-	/**
-	处理流程：
-	1、服务端收到请求
-	2、生成封面图
-	3、上传视频
-	4、上传封面图
-	5、获取视频链接和封面图链接
-	6、将视频完整信息存入数据库
-	*/
-	//videoUrl, coverUrl, err := utils.VideoUploadToKodo(file, *req.UserId)
-	//if err != nil {
-	//	c.String(consts.StatusBadRequest, err.Error())
-	//	return
-	//}
-	//// 将视频信息存入数据库
-	//hlog.Info("videoUrl: ", videoUrl)
-	//hlog.Info("coverUrl: ", coverUrl)
-
-	resp := new(publish.DouyinPublishActionResponse)
+	resp := &publish.DouyinPublishActionResponse{
+		StatusCode: proto.Int32(0),
+		StatusMsg:  proto.String(""),
+	}
+	*resp.StatusCode = 0
+	*resp.StatusMsg = "发布成功"
 
 	c.JSON(consts.StatusOK, resp)
 }

@@ -1,15 +1,15 @@
 package utils
 
 import (
-	dal "mini-Tiktok/biz/dal/mysql"
-	common "mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/repository"
 )
 
 // 提取出一个从数据库中获取用户信息并将其转换为common.User的函数
 // 这里的用户信息中用户是否关注不进行设置，需要另外获取。
 func GetUserInfoFromDb(userID int64) (*common.User, error) {
 	// 获取用户信息
-	userInfo, err := dal.GetUserById(userID)
+	userInfo, err := repository.GetUserById(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -17,7 +17,7 @@ func GetUserInfoFromDb(userID int64) (*common.User, error) {
 	followCount := int64(userInfo.FollowCount)
 	workCount := int64(userInfo.WorkCount)
 	favoriteCount := int64(userInfo.FavoriteCount)
-	uId := int64(userInfo.ID)
+	uId := userInfo.ID
 	totalFav := string(rune(userInfo.TotalFavorited))
 	user := common.User{
 		Id:              &uId,
@@ -40,7 +40,7 @@ func GetUserInfoFromDb(userID int64) (*common.User, error) {
 // 行设置，需要另外获取。
 func GetVideoInfoFromDb(videoID int64) (*common.Video, error) {
 	// 获取视频信息
-	videoInfo, err := dal.GetVideo(videoID)
+	videoInfo, err := repository.GetVideo(videoID)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func GetVideoInfoFromDb(videoID int64) (*common.Video, error) {
 		return nil, err
 	}
 	// 设置视频信息
-	vId := int64(videoInfo.ID)
+	vId := videoInfo.ID
 	video := common.Video{
 		Id:            &vId,
 		Author:        user,
