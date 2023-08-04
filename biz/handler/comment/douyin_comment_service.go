@@ -60,7 +60,7 @@ func CommentAction(ctx context.Context, c *app.RequestContext) {
 		sendErrorResponse(c, 5, err.Error())
 		return
 	}
-	// 设置响应,这里不知道为什么内存会泄漏，所以这里直接使用了new
+	// 设置响应
 	statusCode := int32(0)
 	statusMsg := "success"
 	resp = &comment.DouyinCommentActionResponse{
