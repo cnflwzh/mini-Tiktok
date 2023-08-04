@@ -20,12 +20,12 @@ const (
 
 type CustomClaims struct {
 	Username string `json:"username"`
-	UserID   int    `json:"userId"`
+	UserID   int64  `json:"userId"`
 	jwt.StandardClaims
 }
 
 // GenerateToken 生成JWT Token
-func GenerateToken(username string, userID int) (string, error) {
+func GenerateToken(username string, userID int64) (string, error) {
 	hlog.Info("Begin to generate Token for userID:", userID, " username:", username)
 	// 创建一个自定义的Claims
 	claims := &CustomClaims{
@@ -50,7 +50,7 @@ func GenerateToken(username string, userID int) (string, error) {
 }
 
 // ParseToken 解析JWT Token，如果成功返回userID，如果失败返回错误
-func ParseToken(tokenString string) (int, error) {
+func ParseToken(tokenString string) (int64, error) {
 	// 解析Token，同时验证签名和过期时间
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
@@ -116,7 +116,7 @@ func JWTGenMiddleware() []app.HandlerFunc {
 				return
 			}
 			// 生成Token
-			token, err := GenerateToken(username.(string), userID.(int))
+			token, err := GenerateToken(username.(string), userID.(int64))
 			if err != nil {
 				hlog.Error("Generate token fail:", err)
 				c.AbortWithStatus(401)

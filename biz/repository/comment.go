@@ -1,4 +1,4 @@
-package mysql
+package repository
 
 import (
 	"mini-Tiktok/biz/model/interact/comment"

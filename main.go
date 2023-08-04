@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	h := server.Default()
+	h := server.Default(server.WithMaxRequestBodySize(1024 * 1024 * 1024))
 
 	register(h)
 	h.Spin()

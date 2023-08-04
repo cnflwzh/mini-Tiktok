@@ -7,7 +7,7 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	chat "mini-Tiktok/biz/model/social/chat"
+	"mini-Tiktok/biz/model/social/chat"
 )
 
 // GetChatMessage .

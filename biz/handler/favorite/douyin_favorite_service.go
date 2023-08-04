@@ -4,12 +4,12 @@ package favorite
 
 import (
 	"context"
+	dal "mini-Tiktok/biz/repository"
 
-	dal "mini-Tiktok/biz/dal/mysql"
 	"mini-Tiktok/biz/utils"
 
-	common "mini-Tiktok/biz/model/common"
-	favorite "mini-Tiktok/biz/model/interact/favorite"
+	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/model/interact/favorite"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"

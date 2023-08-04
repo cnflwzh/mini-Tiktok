@@ -1,13 +1,14 @@
-package utils
+package test
 
 import (
 	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"mini-Tiktok/biz/utils"
 	"testing"
 )
 
 func TestHashPassword(t *testing.T) {
 	password := "testPassword"
-	hash, err := HashPassword(password)
+	hash, err := utils.HashPassword(password)
 	hlog.Info("hash", hash)
 	if err != nil {
 		t.Errorf("Error hashing password: %v", err)
@@ -20,7 +21,7 @@ func TestHashPassword(t *testing.T) {
 }
 func TestCheckPasswordHash(t *testing.T) {
 	password := "testPassword"
-	if !CheckPasswordHash(password, "$2a$14$Z.emErTSQ9fN8PnyaxCR8OJZnDi4Iwlw3Ji6Cp0mtC1mFP7fpuONS") {
+	if !utils.CheckPasswordHash(password, "$2a$14$Z.emErTSQ9fN8PnyaxCR8OJZnDi4Iwlw3Ji6Cp0mtC1mFP7fpuONS") {
 		t.Errorf("Expected password to match hash, but got false")
 		return
 	}

@@ -7,7 +7,7 @@
 ```bash
 .
 ├── biz                             // 业务
-│   ├── dal                         // 数据库操作
+│   ├── repository                         // 数据库操作
 │   ├── handler                     // 业务逻辑
 │   │   ├── chat
 │   │   ├── comment
