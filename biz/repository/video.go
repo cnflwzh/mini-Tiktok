@@ -24,3 +24,14 @@ func AddVideo(userId int64, videoUrl string, coverUrl string, title string) (int
 	}
 	return video.ID, nil
 }
+
+func UpdateVideoFavoriteCount(videoId int64, favoriteCount int64) error {
+	var video entity.Video
+	err := DB.Where("id = ?", videoId).First(&video).Error
+	if err != nil {
+		return err
+	}
+	video.FavoriteCount += favoriteCount
+	err = DB.Save(&video).Error
+	return err
+}

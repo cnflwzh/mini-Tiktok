@@ -22,14 +22,14 @@ package entity
 type User struct {
 	Model
 	Name            string `gorm:"column:name;type:varchar(16);not null" json:"name"`
-	FollowCount     int    `gorm:"column:follow_count;type:int(11);not null" json:"follow_count"`
+	FollowCount     int64  `gorm:"column:follow_count;type:int(11);not null" json:"follow_count"`
 	FollowerCount   int64  `gorm:"column:follower_count;type:bigint(20);not null" json:"follower_count"`
 	Avater          string `gorm:"column:avater;type:varchar(300)" json:"avater"`
 	BackgroundImage string `gorm:"column:background_image;type:varchar(300)" json:"background_image"`
 	Signature       string `gorm:"column:signature;type:varchar(300)" json:"signature"`
 	TotalFavorited  int64  `gorm:"column:total_favorited;type:bigint(20);not null" json:"total_favorited"`
-	WorkCount       int    `gorm:"column:work_count;type:int(11);not null" json:"work_count"`
-	FavoriteCount   int    `gorm:"column:favorite_count;type:int(11);not null" json:"favorite_count"`
+	WorkCount       int64  `gorm:"column:work_count;type:int(11);not null" json:"work_count"`
+	FavoriteCount   int64  `gorm:"column:favorite_count;type:int(11);not null" json:"favorite_count"`
 }
 
 func (User) TableName() string {

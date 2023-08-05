@@ -7,10 +7,7 @@ import (
 func CheckUserExist(username string) bool {
 	var userCredential entity.Credentials
 	err := DB.Where("username = ?", username).First(&userCredential).Error
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func AddUserCredential(username string, password string, userId int64) error {
