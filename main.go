@@ -4,11 +4,21 @@ package main
 
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/cors"
+	"time"
 )
 
 func main() {
-	h := server.Default(server.WithMaxRequestBodySize(1024 * 1024 * 1024))
+	h := server.Default(server.WithMaxRequestBodySize(1024*1024*1024),
+		server.WithHostPorts("0.0.0.0:8888"), server.WithRedirectTrailingSlash(true))
 
+	h.Use(cors.New(cors.Config{
+		AllowAllOrigins:  true,
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 	register(h)
 	h.Spin()
 }

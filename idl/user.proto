@@ -46,9 +46,9 @@ service DouyinUserService {
     option (api.get) = "/douyin/user";
   }
   rpc Login(douyin_user_login_request) returns (douyin_user_login_response) {
-    option (api.post) = "/douyin/user/login";
+    option (api.post) = "/douyin/user/login/";
   }
   rpc Register(douyin_user_register_request) returns (douyin_user_register_response) {
-    option (api.post) = "/douyin/user/register";
+    option (api.post) = "/douyin/user/register/";
   }
 }
