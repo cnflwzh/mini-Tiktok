@@ -48,11 +48,35 @@ func Action(ctx context.Context, c *app.RequestContext) {
 			sendResponse(c, 4, err.Error())
 			return
 		}
+		// 更新视频点赞数
+		err = dal.UpdateVideoFavoriteCount(*req.VideoId, 1)
+		if err != nil {
+			sendResponse(c, 5, err.Error())
+			return
+		}
+		// 更新用户点赞数
+		err = dal.UpdateUserFavoriteCount(*req.UserId, 1)
+		if err != nil {
+			sendResponse(c, 5, err.Error())
+			return
+		}
 		sendResponse(c, 0, "点赞成功")
 
 	} else if *req.ActionType == 2 && isFavorite {
 		// 取消点赞
 		err = dal.DeleteFavorite(*req.UserId, *req.VideoId)
+		if err != nil {
+			sendResponse(c, 5, err.Error())
+			return
+		}
+		// 更新视频点赞数
+		err = dal.UpdateVideoFavoriteCount(*req.VideoId, -1)
+		if err != nil {
+			sendResponse(c, 5, err.Error())
+			return
+		}
+		// 更新用户点赞数
+		err = dal.UpdateUserFavoriteCount(*req.UserId, -1)
 		if err != nil {
 			sendResponse(c, 5, err.Error())
 			return

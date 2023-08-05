@@ -27,3 +27,14 @@ func AddUser(username string) (id int64, err error) {
 	}
 	return user.ID, nil
 }
+
+func UpdateUserFavoriteCount(userId int64, favoriteCount int64) error {
+	var user entity.User
+	err := DB.Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return err
+	}
+	user.FavoriteCount += favoriteCount
+	err = DB.Save(&user).Error
+	return err
+}
