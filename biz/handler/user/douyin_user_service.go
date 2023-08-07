@@ -5,6 +5,7 @@ package user
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"google.golang.org/protobuf/proto"
 	"mini-Tiktok/biz/middleware/jwt"
@@ -39,6 +40,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+	hlog.Info("test:", string(c.Request.QueryString()))
 
 	resp := &user.DouyinUserRegisterResponse{
 		StatusCode: proto.Int32(0),

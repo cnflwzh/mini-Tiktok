@@ -128,7 +128,7 @@ func ConvertVideoListToProto(videoList []*entity.Video, loginUserId int64) ([]*c
 		return nil, err
 	}
 
-	author := mysqlAuthor.ToCommonUser()
+	author := mysqlAuthor.ToCommonUser(false)
 
 	isFollow, err := repository.IsFollowing(loginUserId, videoList[0].UserId)
 	if err != nil {
