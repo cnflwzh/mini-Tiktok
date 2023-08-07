@@ -131,3 +131,28 @@ func JWTGenMiddleware() []app.HandlerFunc {
 			c.Next(ctx)
 		}}
 }
+
+// CheckLoginMiddleware 用于鉴权用户是否登录
+func CheckLoginMiddleware() app.HandlerFunc {
+	return func(ctx context.Context, c *app.RequestContext) {
+		// 从请求中获取Token
+		token := c.QueryArgs().Peek("token")
+		if token == nil {
+			hlog.Error("Token not provided")
+			c.AbortWithStatus(401)
+			return
+		}
+		// 将Token转换为字符串
+		tokenString := string(token)
+		// 解析Token
+		userID, err := ParseToken(tokenString)
+		if err != nil {
+			hlog.Error("Invalid Token:", err)
+			c.AbortWithStatus(401)
+			return
+		}
+		// 将用户ID存入上下文，以便后续处理使用
+		c.Set("loginUserId", userID)
+		c.Next(ctx)
+	}
+}
