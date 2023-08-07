@@ -1,6 +1,6 @@
 [database]
 # todo： 等服务器部署后，修改此行
-mysql_dsn = "tiktok:miniTikTok2568@tcp(bj-cynosdbmysql-grp-3qfb4kba.sql.tencentcdb.com:28965)/douyin?charset=utf8&parseTime=True&loc=Local"
+mysql_dsn = "root:2568@tcp(127.0.0.1:25681)/douyin?charset=utf8&parseTime=True&loc=Local"
 
 [kodo]
 access_key=""
