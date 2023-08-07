@@ -34,4 +34,6 @@ _testmain.go
 /output
 *.local.yml
 dumped_hertz_remote_config.json
-*.sql		  
+*.sql
+config/config.toml
+config/config-dev.toml
