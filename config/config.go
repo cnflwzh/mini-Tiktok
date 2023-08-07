@@ -29,5 +29,6 @@ func init() {
 	KodoConfig.AccessKey = Config.GetString("kodo.access_key")
 	KodoConfig.SecretKey = Config.GetString("kodo.secret_key")
 	KodoConfig.Bucket = Config.GetString("kodo.bucket")
+
 	KodoConfig.Domain = Config.GetString("kodo.domain")
 }
