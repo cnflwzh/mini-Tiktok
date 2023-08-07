@@ -38,8 +38,11 @@ func GenerateFileName(userId int64, extension string) string {
 	t := time.Now()
 	fileUUID := uuid.New().String()
 
-	fmt.Fprintf(&str, "/%s/%02d/%02d/%d-%d-%s.%s",
+	_, err := fmt.Fprintf(&str, "%s/%02d/%02d/%d-%d-%s.%s",
 		t.Format("2006"), t.Month(), t.Day(), t.Unix(), userId, fileUUID, extension)
+	if err != nil {
+		hlog.Error("generate file name error", err)
+	}
 	return str.String()
 }
 
