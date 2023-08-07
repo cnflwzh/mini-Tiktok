@@ -65,19 +65,22 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req publish.DouyinPublishListRequest
+
+	token := c.FormValue("token")
+	userId, err := jwt.ParseToken(string(token))
+	if err != nil {
+		utils.SendErrorResponse(c, 20001, "token 解析失败")
+		hlog.Error("token 解析失败", err)
+	}
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	if req.UserId == nil {
-		c.String(consts.StatusBadRequest, "用户ID不能为空")
-		return
-	}
-
 	// 从数据库拿用户视频列表
-	videoList, err := repository.GetUserVideos(*req.UserId)
+	videoList, err := repository.GetUserVideos(userId)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, "获取用户视频失败")
 		return
@@ -85,11 +88,13 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 
 	// 创建响应对象并将获取到的视频列表填充进去
 	resp := &publish.DouyinPublishListResponse{
-		StatusCode: &[]int32{int32(consts.StatusOK)}[0],
+		StatusCode: proto.Int32(0),
+		StatusMsg:  proto.String(""),
 		VideoList:  ConvertVideoListToProto(videoList),
 	}
+	*resp.StatusCode = 200
+	*resp.StatusMsg = "获取用户视频列表成功"
 
-	// Send the response to the client
 	c.JSON(consts.StatusOK, resp)
 }
 
@@ -106,6 +111,7 @@ func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
 	for _, v := range videoList {
 		// 转换ID字段
 		id := int64(v.ID)
+		isFavorite := false
 		commonVideo := &common.Video{
 			Id:            &id,
 			Author:        author,
@@ -114,6 +120,7 @@ func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
 			FavoriteCount: &v.FavoriteCount,
 			CommentCount:  &v.CommentCount,
 			Title:         &v.Title,
+			IsFavorite:    &isFavorite,
 		}
 		commonVideoList = append(commonVideoList, commonVideo)
 	}

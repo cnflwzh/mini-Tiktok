@@ -47,12 +47,13 @@ func (u *User) ToCommonUser() *common.User {
 	workCount := int64(u.WorkCount)
 	favoriteCount := int64(u.FavoriteCount)
 	totalFavorited := strconv.FormatInt(u.TotalFavorited, 10) // 将int64转换为字符串
+	isFollow := false
 	return &common.User{
 		Id:              &id,
 		Name:            &u.Name,
 		FollowCount:     &followCount,
 		FollowerCount:   &u.FollowerCount,
-		IsFollow:        nil, // Set this field according to your logic, as it is not available in the original User struct.
+		IsFollow:        &isFollow, // Set this field according to your logic, as it is not available in the original User struct.
 		Avatar:          &u.Avater,
 		BackgroundImage: &u.BackgroundImage,
 		Signature:       &u.Signature,
