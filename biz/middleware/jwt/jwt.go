@@ -3,11 +3,11 @@ package jwt
 import (
 	"context"
 	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/dgrijalva/jwt-go"
 )
 
 const (
@@ -21,18 +21,20 @@ const (
 type CustomClaims struct {
 	Username string `json:"username"`
 	UserID   int64  `json:"userId"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 // GenerateToken 生成JWT Token
 func GenerateToken(username string, userID int64) (string, error) {
 	hlog.Info("Begin to generate Token for userID:", userID, " username:", username)
 	// 创建一个自定义的Claims
-	claims := &CustomClaims{
-		Username: username,
-		UserID:   userID,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(expirationTime).Unix(),
+	claims := CustomClaims{
+		username,
+		userID,
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expirationTime)), //过期时间
+			IssuedAt:  jwt.NewNumericDate(time.Now()),                     // 签发时间
+			NotBefore: jwt.NewNumericDate(time.Now()),                     // 生效时间
 		},
 	}
 
