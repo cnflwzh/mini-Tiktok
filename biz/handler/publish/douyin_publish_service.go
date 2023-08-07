@@ -4,14 +4,17 @@ package publish
 
 import (
 	"context"
+	"mini-Tiktok/biz/entity"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/model/publish"
+	"mini-Tiktok/biz/repository"
+	"mini-Tiktok/biz/utils"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"google.golang.org/protobuf/proto"
-	"mini-Tiktok/biz/middleware/jwt"
-	"mini-Tiktok/biz/model/publish"
-	"mini-Tiktok/biz/repository"
-	"mini-Tiktok/biz/utils"
 )
 
 // PublishAction .
@@ -62,13 +65,65 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req publish.DouyinPublishListRequest
+
+	token := c.FormValue("token")
+	userId, err := jwt.ParseToken(string(token))
+	if err != nil {
+		utils.SendErrorResponse(c, 20001, "token 解析失败")
+		hlog.Error("token 解析失败", err)
+	}
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(publish.DouyinPublishListResponse)
+	// 从数据库拿用户视频列表
+	videoList, err := repository.GetUserVideos(userId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "获取用户视频失败")
+		return
+	}
+
+	// 创建响应对象并将获取到的视频列表填充进去
+	resp := &publish.DouyinPublishListResponse{
+		StatusCode: proto.Int32(0),
+		StatusMsg:  proto.String(""),
+		VideoList:  ConvertVideoListToProto(videoList),
+	}
+	*resp.StatusCode = 200
+	*resp.StatusMsg = "获取用户视频列表成功"
 
 	c.JSON(consts.StatusOK, resp)
+}
+
+// 将[]*video.Video转换为[]*common.Video
+func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
+	var commonVideoList []*common.Video
+
+	mysqlAuthor, err := repository.GetUserById(*&videoList[0].UserId)
+	if err != nil {
+		return nil
+	}
+	author := mysqlAuthor.ToCommonUser()
+
+	for _, v := range videoList {
+		// 转换ID字段
+		id := int64(v.ID)
+		isFavorite := false
+		commonVideo := &common.Video{
+			Id:            &id,
+			Author:        author,
+			PlayUrl:       &v.PlayUrl,
+			CoverUrl:      &v.CoverUrl,
+			FavoriteCount: &v.FavoriteCount,
+			CommentCount:  &v.CommentCount,
+			Title:         &v.Title,
+			IsFavorite:    &isFavorite,
+		}
+		commonVideoList = append(commonVideoList, commonVideo)
+	}
+
+	return commonVideoList
 }

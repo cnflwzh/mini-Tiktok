@@ -263,8 +263,8 @@ type DouyinRelationFollowerListRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId  *int64 `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"`      // 用户id
-	TokenId *int64 `protobuf:"varint,2,req,name=token_id,json=tokenId" json:"token_id,required" form:"token_id,required" query:"token_id,required"` // 用户鉴权token
+	UserId  *int64 `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"`                          // 用户id
+	TokenId *int64 `protobuf:"varint,2,req,name=token_user_id,json=tokenId" json:"token_user_id,required" form:"token_user_id,required" query:"token_user_id,required"` // 用户鉴权token
 }
 
 func (x *DouyinRelationFollowerListRequest) Reset() {

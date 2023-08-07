@@ -89,8 +89,12 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 				c.AbortWithStatus(401)
 				return
 			}
-			// 将用户ID存入params
-			c.Request.SetQueryString(fmt.Sprintf("user_id=%d&", userID) + string(c.Request.QueryString()))
+			if c.QueryArgs().Peek("user_id") != nil {
+				c.Request.SetQueryString(fmt.Sprintf("token_user_id=%d&", userID) + string(c.Request.QueryString()))
+			} else {
+				// 将用户ID存入params
+				c.Request.SetQueryString(fmt.Sprintf("user_id=%d&", userID) + string(c.Request.QueryString()))
+			}
 			// 看一下params
 			hlog.Info("Params:", string(c.Request.QueryString()))
 			c.Next(ctx)
