@@ -7,6 +7,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/google/uuid v1.3.0
 	github.com/h2non/filetype v1.1.3
+	github.com/hertz-contrib/cors v0.0.0-20230423034624-2bc83a8400f0
 	github.com/qiniu/go-sdk/v7 v7.17.0
 	github.com/spf13/viper v1.16.0
 	golang.org/x/crypto v0.11.0
@@ -27,7 +28,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/henrylee2cn/ameda v1.4.10 // indirect
 	github.com/henrylee2cn/goutil v0.0.0-20210127050712-89660552f6f8 // indirect
-	github.com/hertz-contrib/cors v0.0.0-20230423034624-2bc83a8400f0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
