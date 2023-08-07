@@ -108,7 +108,7 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	var StatusMsg string
 	var UserList []*common.User
 
-	resp.UserList, err = repository.GetFollowerList(int64(userId))
+	UserList, err = repository.GetFollowerList(int64(userId))
 	if err != nil {
 		StatusCode = int32(-1)
 		StatusMsg = "用户" + strconv.FormatInt(int64(userId), 10) + "浏览粉丝列表失败"
