@@ -5,6 +5,8 @@ import (
 	"mini-Tiktok/biz/entity"
 	"mini-Tiktok/biz/model/common"
 	"mini-Tiktok/biz/model/social/relation"
+
+	"gorm.io/gorm"
 )
 
 func Follow(userId int64, toUserId int64) error {
@@ -123,4 +125,22 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 
 	return requiredUsers, err
 
+}
+
+// IsFollowing 查询用户是否关注某人
+func IsFollowing(userId int64, followId int64) (bool, error) {
+	var followRelation entity.UserFollow
+	result := DB.Model(&entity.UserFollow{}).
+		Where("user_id = ?", userId).
+		Where("follow_id = ?", followId).
+		First(&followRelation)
+
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return false, nil // 没有找到记录，说明用户未关注
+		}
+		return false, result.Error
+	}
+
+	return true, nil // 找到记录，说明用户已关注
 }
