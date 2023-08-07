@@ -18,7 +18,8 @@ message douyin_relation_action_response {
 
 message douyin_relation_follow_list_request {
   required int64 user_id = 1; // 用户id
-  required int64 token = 2; // 用户鉴权token
+  // required int64 token = 2; // 用户鉴权token
+  required int64 token_user_id = 2; // 用户鉴权token_user_id
 }
 
 message douyin_relation_follow_list_response {
@@ -29,7 +30,8 @@ message douyin_relation_follow_list_response {
 
 message douyin_relation_follower_list_request {
   required int64 user_id = 1; // 用户id
-  required int64 token_id = 2; // 用户鉴权token
+  // required int64 token_id = 2; // 用户鉴权token
+  required int64 token_user_id = 2; // 用户鉴权token_user_id
 }
 
 message douyin_relation_follower_list_response {
