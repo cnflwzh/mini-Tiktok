@@ -41,13 +41,13 @@ func (User) TableName() string {
 	return "user_profile"
 }
 
-func (u *User) ToCommonUser() *common.User {
+func (u *User) ToCommonUser(IsFollow bool) *common.User {
 	id := int64(u.ID)
 	followCount := int64(u.FollowCount)
 	workCount := int64(u.WorkCount)
 	favoriteCount := int64(u.FavoriteCount)
 	totalFavorited := strconv.FormatInt(u.TotalFavorited, 10) // 将int64转换为字符串
-	isFollow := false
+	isFollow := IsFollow
 	return &common.User{
 		Id:              &id,
 		Name:            &u.Name,
