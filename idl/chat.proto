@@ -13,7 +13,7 @@ message Message {
 }
 
 message douyin_message_chat_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required int64 to_user_id = 2; // 对方用户id
   required int64 pre_msg_time=3;//上次最新消息的时间（新增字段-apk更新中）
 }
@@ -25,7 +25,7 @@ message douyin_message_chat_response {
 }
 
 message douyin_message_action_request {
-  required string token = 1; // 用户鉴权token
+  required int64 user_id = 1; // 用户鉴权token
   required int64 to_user_id = 2; // 对方用户id
   required int32 action_type = 3; // 1-发送消息
   required string content = 4; // 消息内容

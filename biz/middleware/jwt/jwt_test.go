@@ -10,7 +10,7 @@ var token string
 
 func TestGenerateAndParseToken(t *testing.T) {
 	username := "testUser"
-	userID := 456
+	userID := int64(456)
 
 	// 生成Token
 	token, err := GenerateToken(username, userID)

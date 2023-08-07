@@ -4,10 +4,13 @@ package comment
 
 import (
 	"context"
+	dal "mini-Tiktok/biz/repository"
+
+	"mini-Tiktok/biz/model/interact/comment"
+	"mini-Tiktok/biz/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	comment "mini-Tiktok/biz/model/interact/comment"
 )
 
 // CommentAction .
@@ -15,13 +18,61 @@ import (
 func CommentAction(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req comment.DouyinCommentActionRequest
+	var comID int64
+	var createTime string
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
-
 	resp := new(comment.DouyinCommentActionResponse)
+	// 判断当前用户行为是删除评论还是添加评论
+	// 如果是删除评论，判断当前用户是否是评论的作者
+	isAdd := *req.ActionType == 1
+	if !isAdd {
+		// 判断当前用户是否是评论的作者
+		isAuthor, err := dal.IsCommentAuthor(*req.UserId, *req.CommentId)
+		if err != nil {
+			sendErrorResponse(c, 1, err.Error())
+			return
+		}
+		if !isAuthor {
+			sendErrorResponse(c, 2, "当前用户不是评论的作者")
+			return
+		}
+		// 删除评论
+		comID, createTime, err = dal.DeleteComment(*req.CommentId)
+		if err != nil {
+			sendErrorResponse(c, 3, err.Error())
+			return
+		}
+	} else {
+		// 添加评论
+		comID, createTime, err = dal.AddComment(*req.UserId, *req.VideoId, *req.CommentText)
+		if err != nil {
+			sendErrorResponse(c, 4, err.Error())
+			return
+		}
+	}
+	// 获取用户信息
+	user, err := utils.GetUserInfoFromDb(*req.UserId)
+	if err != nil {
+		sendErrorResponse(c, 5, err.Error())
+		return
+	}
+	// 设置响应
+	statusCode := int32(0)
+	statusMsg := "success"
+	resp = &comment.DouyinCommentActionResponse{
+		StatusCode: &statusCode,
+		StatusMsg:  &statusMsg,
+		Comment: &comment.Comment{
+			Id:         &comID,
+			User:       user,
+			Content:    req.CommentText,
+			CreateDate: &createTime,
+		},
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -36,8 +87,46 @@ func CommentList(ctx context.Context, c *app.RequestContext) {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
+	// 获取评论列表
+	commentList, err := dal.GetCommentList(*req.VideoId)
+	if err != nil {
+		sendErrorResponse(c, 1, err.Error())
+		return
+	}
+	// 将评论列表转换为响应的评论列表
+	var comments []*comment.Comment
+	for _, com := range commentList {
+		// 获取用户信息
+		user, err := utils.GetUserInfoFromDb(com.UserId)
+		if err != nil {
+			sendErrorResponse(c, 2, err.Error())
+			return
+		}
+		id := int64(com.ID)
+		createdAt := com.CreatedAt.Format("2006-01-02 15:04:05")
+		// 设置响应
+		comments = append(comments, &comment.Comment{
+			Id:         &id,
+			User:       user,
+			Content:    &com.Content,
+			CreateDate: &createdAt,
+		})
+	}
+	// 设置响应
+	statusCode := int32(0)
+	statusMsg := "success"
+	resp := &comment.DouyinCommentListResponse{
+		StatusCode:  &statusCode,
+		StatusMsg:   &statusMsg,
+		CommentList: comments,
+	}
+	c.JSON(consts.StatusOK, resp)
+}
 
-	resp := new(comment.DouyinCommentListResponse)
-
+func sendErrorResponse(c *app.RequestContext, statusCode int32, statusMsg string) {
+	resp := &comment.DouyinCommentActionResponse{
+		StatusCode: &statusCode,
+		StatusMsg:  &statusMsg,
+	}
 	c.JSON(consts.StatusOK, resp)
 }
