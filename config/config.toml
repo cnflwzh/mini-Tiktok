@@ -1,9 +1,7 @@
 [database]
 # todo： 等服务器部署后，修改此行
-mysql_dsn = "root:2568@tcp(127.0.0.1:25681)/douyin?charset=utf8&parseTime=True&loc=Local"
+mysql_dsn = "tiktok:tiktok@tcp(tiktok-mysql:3306)/douyin?charset=utf8&parseTime=True&loc=Local"
 
 [kodo]
-access_key=""
-secret_key=""
-bucket= ""
-domain= ""
+bucket= "2568douyin"
+domain= "http://ryi1c8rs5.hn-bkt.clouddn.com"

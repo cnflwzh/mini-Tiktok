@@ -1,7 +1,9 @@
 package config
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/spf13/viper"
+	"os"
 )
 
 var (
@@ -26,8 +28,15 @@ func init() {
 		panic(err)
 	}
 	Dsn = Config.GetString("database.mysql_dsn")
-	KodoConfig.AccessKey = Config.GetString("kodo.access_key")
-	KodoConfig.SecretKey = Config.GetString("kodo.secret_key")
+	KodoConfig.AccessKey = os.Getenv("KODO_ACCESS_KEY")
+	KodoConfig.SecretKey = os.Getenv("KODO_SECRET_KEY")
+	//KodoConfig.Bucket = os.Getenv("KODO_BUCKET")
+	//KodoConfig.Domain = os.Getenv("KODO_DOMAIN")
+	if KodoConfig.AccessKey != "" && KodoConfig.SecretKey != "" {
+		hlog.Info("kodo config success")
+	} else {
+		hlog.Info("kodo config failed")
+	}
 	KodoConfig.Bucket = Config.GetString("kodo.bucket")
 	KodoConfig.Domain = Config.GetString("kodo.domain")
 }
