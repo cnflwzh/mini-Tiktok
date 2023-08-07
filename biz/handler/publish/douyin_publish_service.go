@@ -106,7 +106,7 @@ func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
 	if err != nil {
 		return nil
 	}
-	author := mysqlAuthor.ToCommonUser()
+	author := mysqlAuthor.ToCommonUser(false)
 
 	for _, v := range videoList {
 		// 转换ID字段
