@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/cloudwego/hertz v0.6.7
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/google/uuid v1.3.0
 	github.com/h2non/filetype v1.1.3
 	github.com/hertz-contrib/cors v0.0.0-20230423034624-2bc83a8400f0
