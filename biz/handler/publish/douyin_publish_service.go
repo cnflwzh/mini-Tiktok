@@ -66,11 +66,14 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req publish.DouyinPublishListRequest
 
-	token := c.FormValue("token")
-	userId, err := jwt.ParseToken(string(token))
-	if err != nil {
-		utils.SendErrorResponse(c, 20001, "token 解析失败")
-		hlog.Error("token 解析失败", err)
+	// 鉴权用户是否登录
+	jwt.CheckLoginMiddleware()(ctx, c)
+
+	// 获取登录用户ID
+	loginUserId, ok := c.Get("loginUserId")
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取登录用户ID")
+		return
 	}
 
 	err = c.BindAndValidate(&req)
@@ -79,41 +82,69 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	if req.UserId == nil {
+		c.String(consts.StatusBadRequest, "查询用户ID不能为空")
+		return
+	}
+
 	// 从数据库拿用户视频列表
-	videoList, err := repository.GetUserVideos(userId)
+	videoList, err := repository.GetUserVideos(*req.UserId)
 	if err != nil {
 		c.String(consts.StatusInternalServerError, "获取用户视频失败")
 		return
 	}
 
-	// 创建响应对象并将获取到的视频列表填充进去
-	resp := &publish.DouyinPublishListResponse{
-		StatusCode: proto.Int32(0),
-		StatusMsg:  proto.String(""),
-		VideoList:  ConvertVideoListToProto(videoList),
+	// 进行类型断言将 loginUserId 转换为 int64
+	loginUserIDInt64, ok := loginUserId.(int64)
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取正确的登录用户ID")
+		return
 	}
-	*resp.StatusCode = 200
+
+	// 创建响应对象并将获取到的视频列表填充进去
+	commonVideoList, err := ConvertVideoListToProto(videoList, loginUserIDInt64)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "转换视频数据结构错误")
+		return
+	}
+
+	resp := &publish.DouyinPublishListResponse{
+		StatusCode: proto.Int32(1),
+		StatusMsg:  proto.String(""),
+		VideoList:  commonVideoList,
+	}
+	*resp.StatusCode = 0
 	*resp.StatusMsg = "获取用户视频列表成功"
 
 	c.JSON(consts.StatusOK, resp)
 }
 
 // 将[]*video.Video转换为[]*common.Video
-func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
+func ConvertVideoListToProto(videoList []*entity.Video, loginUserId int64) ([]*common.Video, error) {
 	var commonVideoList []*common.Video
 
 	mysqlAuthor, err := repository.GetUserById(*&videoList[0].UserId)
 	if err != nil {
-		return nil
+		return nil, err
 	}
+
 	author := mysqlAuthor.ToCommonUser()
 
+	isFollow, err := repository.IsFollowing(loginUserId, videoList[0].UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	author.IsFollow = &isFollow
+
 	for _, v := range videoList {
-		// 转换ID字段
-		id := int64(v.ID)
-		isFavorite := false
+		videoId := int64(v.ID)
+		isFavorite, err := repository.IsFavorite(loginUserId, videoId)
+		if err != nil {
+			return commonVideoList, err
+		}
 		commonVideo := &common.Video{
-			Id:            &id,
+			Id:            &videoId,
 			Author:        author,
 			PlayUrl:       &v.PlayUrl,
 			CoverUrl:      &v.CoverUrl,
@@ -125,5 +156,5 @@ func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
 		commonVideoList = append(commonVideoList, commonVideo)
 	}
 
-	return commonVideoList
+	return commonVideoList, nil
 }
