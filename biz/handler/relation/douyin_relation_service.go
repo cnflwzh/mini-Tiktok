@@ -4,6 +4,7 @@ package relation
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"mini-Tiktok/biz/repository"
 	"strconv"
 
@@ -45,6 +46,7 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
+		hlog.Error("follow error:", err.Error(), string(c.URI().QueryString()))
 		return
 	}
 
@@ -55,6 +57,7 @@ func RelationFollowList(ctx context.Context, c *app.RequestContext) {
 		*resp.StatusCode = int32(-1)
 		*resp.StatusMsg = "用户" + strconv.FormatInt(req.GetUserId(), 10) + "浏览关注列表失败"
 		c.JSON(consts.StatusOK, resp)
+		hlog.Error("follow error:", err.Error())
 		return
 	}
 	*resp.StatusCode = int32(0)
@@ -71,6 +74,7 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
+		hlog.Error("follow error:", err.Error(), string(c.URI().QueryString()))
 		return
 	}
 
