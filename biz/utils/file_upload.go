@@ -37,8 +37,8 @@ func VideoUploadToKodo(videoByte []byte, userId int64) (videoUrl string, coverUr
 		return "", "", fmt.Errorf("error uploading video %s: %w", key, err)
 	}
 
-	videoUrl = fmt.Sprintf("%s%s", config.KodoConfig.Domain, ret.Key)
-	coverUrl = fmt.Sprintf("%s%s%s", config.KodoConfig.Domain, ret.Key, CoverParams)
+	videoUrl = fmt.Sprintf("%s/%s", config.KodoConfig.Domain, ret.Key)
+	coverUrl = fmt.Sprintf("%s/%s%s", config.KodoConfig.Domain, ret.Key, CoverParams)
 
 	return videoUrl, coverUrl, nil
 }
