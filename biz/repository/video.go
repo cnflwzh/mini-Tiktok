@@ -35,3 +35,10 @@ func UpdateVideoFavoriteCount(videoId int64, favoriteCount int64) error {
 	err = DB.Save(&video).Error
 	return err
 }
+
+// 获取指定用户发布的所有视频列表
+func GetUserVideos(userId int64) ([]*entity.Video, error) {
+	var videos []*entity.Video
+	err := DB.Where("user_id = ?", userId).Find(&videos).Error
+	return videos, err
+}

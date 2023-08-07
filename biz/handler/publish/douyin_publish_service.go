@@ -4,14 +4,17 @@ package publish
 
 import (
 	"context"
+	"mini-Tiktok/biz/entity"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/model/publish"
+	"mini-Tiktok/biz/repository"
+	"mini-Tiktok/biz/utils"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 	"google.golang.org/protobuf/proto"
-	"mini-Tiktok/biz/middleware/jwt"
-	"mini-Tiktok/biz/model/publish"
-	"mini-Tiktok/biz/repository"
-	"mini-Tiktok/biz/utils"
 )
 
 // PublishAction .
@@ -68,7 +71,52 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(publish.DouyinPublishListResponse)
+	if req.UserId == nil {
+		c.String(consts.StatusBadRequest, "用户ID不能为空")
+		return
+	}
 
+	// 从数据库拿用户视频列表
+	videoList, err := repository.GetUserVideos(*req.UserId)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "获取用户视频失败")
+		return
+	}
+
+	// 创建响应对象并将获取到的视频列表填充进去
+	resp := &publish.DouyinPublishListResponse{
+		StatusCode: &[]int32{int32(consts.StatusOK)}[0],
+		VideoList:  ConvertVideoListToProto(videoList),
+	}
+
+	// Send the response to the client
 	c.JSON(consts.StatusOK, resp)
+}
+
+// 将[]*video.Video转换为[]*common.Video
+func ConvertVideoListToProto(videoList []*entity.Video) []*common.Video {
+	var commonVideoList []*common.Video
+
+	mysqlAuthor, err := repository.GetUserById(*&videoList[0].UserId)
+	if err != nil {
+		return nil
+	}
+	author := mysqlAuthor.ToCommonUser()
+
+	for _, v := range videoList {
+		// 转换ID字段
+		id := int64(v.ID)
+		commonVideo := &common.Video{
+			Id:            &id,
+			Author:        author,
+			PlayUrl:       &v.PlayUrl,
+			CoverUrl:      &v.CoverUrl,
+			FavoriteCount: &v.FavoriteCount,
+			CommentCount:  &v.CommentCount,
+			Title:         &v.Title,
+		}
+		commonVideoList = append(commonVideoList, commonVideo)
+	}
+
+	return commonVideoList
 }

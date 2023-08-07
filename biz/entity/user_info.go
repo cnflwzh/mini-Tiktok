@@ -1,5 +1,10 @@
 package entity
 
+import (
+	"mini-Tiktok/biz/model/common"
+	"strconv"
+)
+
 // DROP TABLE IF EXISTS `user_profile`;
 // CREATE TABLE `user_profile`  (
 //   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户ID',
@@ -34,4 +39,25 @@ type User struct {
 
 func (User) TableName() string {
 	return "user_profile"
+}
+
+func (u *User) ToCommonUser() *common.User {
+	id := int64(u.ID)
+	followCount := int64(u.FollowCount)
+	workCount := int64(u.WorkCount)
+	favoriteCount := int64(u.FavoriteCount)
+	totalFavorited := strconv.FormatInt(u.TotalFavorited, 10) // 将int64转换为字符串
+	return &common.User{
+		Id:              &id,
+		Name:            &u.Name,
+		FollowCount:     &followCount,
+		FollowerCount:   &u.FollowerCount,
+		IsFollow:        nil, // Set this field according to your logic, as it is not available in the original User struct.
+		Avatar:          &u.Avater,
+		BackgroundImage: &u.BackgroundImage,
+		Signature:       &u.Signature,
+		TotalFavorited:  &totalFavorited,
+		WorkCount:       &workCount,
+		FavoriteCount:   &favoriteCount,
+	}
 }
