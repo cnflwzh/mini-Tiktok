@@ -3,11 +3,6 @@ on:
   pull_request:
     branches:
       - master
-      - dev
-  push:
-    branches:
-      - master
-      - dev
   schedule:
     - cron: '0 3 * * *'
 
