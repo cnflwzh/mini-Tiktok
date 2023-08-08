@@ -2,11 +2,12 @@ package repository
 
 import (
 	"mini-Tiktok/biz/entity"
+	"mini-Tiktok/config"
 )
 
 func CheckUserExist(username string) bool {
 	var userCredential entity.Credentials
-	err := DB.Where("username = ?", username).First(&userCredential).Error
+	err := config.DB.Where("username = ?", username).First(&userCredential).Error
 	return err == nil
 }
 
@@ -16,7 +17,7 @@ func AddUserCredential(username string, password string, userId int64) error {
 		Password: password,
 		UserId:   userId,
 	}
-	err := DB.Create(&userCredential).Error
+	err := config.DB.Create(&userCredential).Error
 	if err != nil {
 		return err
 	}
@@ -25,7 +26,7 @@ func AddUserCredential(username string, password string, userId int64) error {
 
 func GetUserCredential(username string) (string, int64, error) {
 	var userCredential entity.Credentials
-	err := DB.Where("username = ?", username).First(&userCredential).Error
+	err := config.DB.Where("username = ?", username).First(&userCredential).Error
 	if err != nil {
 		return "", -1, err
 	}

@@ -1,21 +1,26 @@
 /*
  Navicat Premium Data Transfer
 
- Source Server         : LocalMySQL
+ Source Server         : TencentDB
  Source Server Type    : MySQL
- Source Server Version : 50742
- Source Host           : localhost:33061
- Source Schema         : tiktok
+ Source Server Version : 50718
+ Source Host           : bj-cynosdbmysql-grp-3qfb4kba.sql.tencentcdb.com:28965
+ Source Schema         : douyin
 
  Target Server Type    : MySQL
- Target Server Version : 50742
+ Target Server Version : 50718
  File Encoding         : 65001
 
- Date: 29/07/2023 23:44:49
+ Date: 08/08/2023 00:23:08
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+CREATE DATABASE IF NOT EXISTS douyin;
+USE douyin;
+
+GRANT ALL PRIVILEGES ON douyin.* TO 'tiktok'@'%';
 
 -- ----------------------------
 -- Table structure for inter_message
@@ -34,6 +39,20 @@ CREATE TABLE `inter_message`  (
   INDEX `fk_message_to_user_id`(`to_user_id`) USING BTREE,
   CONSTRAINT `fk_message_from_user_id` FOREIGN KEY (`from_user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_message_to_user_id` FOREIGN KEY (`to_user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Table structure for system_config
+-- ----------------------------
+DROP TABLE IF EXISTS `system_config`;
+CREATE TABLE `system_config`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `config_key` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '配置键',
+  `config_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '配置值',
+  `created_at` datetime NOT NULL COMMENT '创建时间',
+  `updated_at` datetime NULL DEFAULT NULL COMMENT '更新时间',
+  `deleted_at` datetime NULL DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -50,7 +69,7 @@ CREATE TABLE `user_credentials`  (
   PRIMARY KEY (`username`) USING BTREE,
   INDEX `fk_user_id`(`user_id`) USING BTREE,
   CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户登录信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户登录信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for user_follow
@@ -61,9 +80,9 @@ CREATE TABLE `user_follow`  (
   `follow_id` bigint(20) NOT NULL COMMENT '被关注用户ID',
   PRIMARY KEY (`user_id`, `follow_id`) USING BTREE,
   INDEX `fk_follow_follow_id`(`follow_id`) USING BTREE,
-  CONSTRAINT `fk_follow_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_follow_follow_id` FOREIGN KEY (`follow_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户关注关系表' ROW_FORMAT = Dynamic;
+  CONSTRAINT `fk_follow_follow_id` FOREIGN KEY (`follow_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_follow_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户关注关系表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for user_profile
@@ -84,7 +103,7 @@ CREATE TABLE `user_profile`  (
   `updated_at` datetime NULL DEFAULT NULL COMMENT '更新时间',
   `deleted_at` datetime NULL DEFAULT NULL COMMENT '删除时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户基本信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户基本信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for video_comment
@@ -103,7 +122,7 @@ CREATE TABLE `video_comment`  (
   INDEX `fk_comment_user_id`(`user_id`) USING BTREE,
   CONSTRAINT `fk_comment_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_comment_video_id` FOREIGN KEY (`video_id`) REFERENCES `video_info` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '视频评论表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '视频评论表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for video_info
@@ -123,7 +142,7 @@ CREATE TABLE `video_info`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   CONSTRAINT `fk_video_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '视频信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '视频信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for video_user_like
@@ -134,8 +153,8 @@ CREATE TABLE `video_user_like`  (
   `video_id` bigint(20) NOT NULL COMMENT '视频id',
   PRIMARY KEY (`user_id`, `video_id`) USING BTREE,
   INDEX `fk_like_video_id`(`video_id`) USING BTREE,
-  CONSTRAINT `fk_like_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_like_video_id` FOREIGN KEY (`video_id`) REFERENCES `video_info` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户点赞视频' ROW_FORMAT = Dynamic;
+  CONSTRAINT `fk_like_user_id` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_like_video_id` FOREIGN KEY (`video_id`) REFERENCES `video_info` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户点赞视频' ROW_FORMAT = DYNAMIC;
 
 SET FOREIGN_KEY_CHECKS = 1;

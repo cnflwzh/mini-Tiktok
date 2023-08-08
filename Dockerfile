@@ -1,5 +1,5 @@
-# 使用官方的Go image作为基础image
-FROM golang:1.21rc4 AS build
+# 使用官方的Go image作为基础image进行构建
+FROM golang:1.20.7 AS builder
 
 # 在image内部设置工作目录
 WORKDIR /app
@@ -10,14 +10,36 @@ COPY . .
 # 设置Go Modules的proxy
 ENV GOPROXY=https://goproxy.cn,direct
 
-# 下载依赖项
-RUN go mod download
+# 下载依赖项并编译项目，生成可执行文件
+# 开启CGO_ENABLED=0来做完全静态编译
+RUN CGO_ENABLED=0 go mod download && \
+    CGO_ENABLED=0 go build -ldflags '-w -extldflags "-static"' -o /myapp .
 
-# 编译项目，生成可执行文件
-RUN go build -o main .
+################################################
 
-# 暴露端口，这个端口应该和你的应用程序实际使用的端口一致
-EXPOSE 8888
+# 使用轻量级的基础镜像
+FROM debian:buster-slim
+
+# 创建非root用户
+RUN useradd -m myuser
+
+# 切换到非root用户
+USER myuser
+
+# 将工作目录设置为该用户的home目录
+WORKDIR /home/myuser
+
+# 从builder阶段复制构建的可执行文件
+COPY --from=builder /myapp /myapp
+
+# 编译应用之后，复制配置文件
+COPY config/config.toml config/config.toml
+
+# 声明环境变量，该值可以在运行时通过docker命令传入
+ENV MYSQL_ADDR=$MYSQL_ADDR
 
 # 容器启动时运行的命令
-CMD ["./main"]
+CMD ["/myapp"]
+
+# 暴露端口
+EXPOSE 8888
