@@ -1,12 +1,17 @@
 package config
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"os"
 )
 
 var (
-	Dsn        string
 	KodoConfig Kodo
+	DB         *gorm.DB
 )
 
 type Kodo struct {
@@ -16,8 +21,14 @@ type Kodo struct {
 	Domain    string
 }
 
-// init initializes the config.
 func init() {
+	Config := readConfig()
+	Dsn := getDSN(Config)
+	DB = setupDatabase(Dsn)
+	KodoConfig = loadKodoConfig(DB)
+}
+
+func readConfig() *viper.Viper {
 	Config := viper.New()
 	Config.SetConfigName("config")
 	Config.SetConfigFile("config/config.toml")
@@ -25,9 +36,35 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	Dsn = Config.GetString("database.mysql_dsn")
-	KodoConfig.AccessKey = Config.GetString("kodo.access_key")
-	KodoConfig.SecretKey = Config.GetString("kodo.secret_key")
-	KodoConfig.Bucket = Config.GetString("kodo.bucket")
-	KodoConfig.Domain = Config.GetString("kodo.domain")
+	return Config
+}
+
+func getDSN(Config *viper.Viper) string {
+	if Dsn, exists := os.LookupEnv("MYSQL_ADDR"); exists {
+		hlog.Info("MYSQL_ADDR", Dsn)
+		return Dsn
+	}
+	return Config.GetString("database.mysql_dsn")
+}
+
+func setupDatabase(Dsn string) *gorm.DB {
+	DB, err := gorm.Open(mysql.Open(Dsn), &gorm.Config{
+		SkipDefaultTransaction: true,
+		PrepareStmt:            true,
+		Logger:                 logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		panic(err)
+	}
+	return DB
+}
+
+func loadKodoConfig(DB *gorm.DB) Kodo {
+	var kodoConfig Kodo
+	DB.Table("system_config").Select("config_value").Where("config_key = ?", "kodo_access_key").Scan(&kodoConfig.AccessKey)
+	DB.Table("system_config").Select("config_value").Where("config_key = ?", "kodo_secret_key").Scan(&kodoConfig.SecretKey)
+	DB.Table("system_config").Select("config_value").Where("config_key = ?", "kodo_bucket_name").Scan(&kodoConfig.Bucket)
+	DB.Table("system_config").Select("config_value").Where("config_key = ?", "kodo_domain").Scan(&kodoConfig.Domain)
+
+	return kodoConfig
 }

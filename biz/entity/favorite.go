@@ -1,4 +1,4 @@
-package favorite
+package entity
 
 // DROP TABLE IF EXISTS `video_user_like`;
 // CREATE TABLE `video_user_like`  (

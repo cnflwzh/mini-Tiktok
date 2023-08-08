@@ -2,12 +2,13 @@ package repository
 
 import (
 	"mini-Tiktok/biz/entity"
+	"mini-Tiktok/config"
 )
 
 // 获取视频
 func GetVideo(videoId int64) (*entity.Video, error) {
 	var v entity.Video
-	err := DB.Where("id = ?", videoId).First(&v).Error
+	err := config.DB.Where("id = ?", videoId).First(&v).Error
 	return &v, err
 }
 
@@ -18,7 +19,7 @@ func AddVideo(userId int64, videoUrl string, coverUrl string, title string) (int
 		CoverUrl: coverUrl,
 		Title:    title,
 	}
-	err := DB.Create(&video).Error
+	err := config.DB.Create(&video).Error
 	if err != nil {
 		return 0, err
 	}
@@ -27,18 +28,18 @@ func AddVideo(userId int64, videoUrl string, coverUrl string, title string) (int
 
 func UpdateVideoFavoriteCount(videoId int64, favoriteCount int64) error {
 	var video entity.Video
-	err := DB.Where("id = ?", videoId).First(&video).Error
+	err := config.DB.Where("id = ?", videoId).First(&video).Error
 	if err != nil {
 		return err
 	}
 	video.FavoriteCount += favoriteCount
-	err = DB.Save(&video).Error
+	err = config.DB.Save(&video).Error
 	return err
 }
 
 // 获取指定用户发布的所有视频列表
 func GetUserVideos(userId int64) ([]*entity.Video, error) {
 	var videos []*entity.Video
-	err := DB.Where("user_id = ?", userId).Find(&videos).Error
+	err := config.DB.Where("user_id = ?", userId).Find(&videos).Error
 	return videos, err
 }
