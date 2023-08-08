@@ -14,7 +14,7 @@ const CoverParams = "?vframe/jpg/offset/1/w/360/h/480"
 var FormUploader *storage.FormUploader
 var mac = qbox.NewMac(config.KodoConfig.AccessKey, config.KodoConfig.SecretKey)
 
-func KodoInit() {
+func init() {
 	cfg := storage.Config{}
 	cfg.Zone = &storage.ZoneHuanan
 	cfg.UseHTTPS = false

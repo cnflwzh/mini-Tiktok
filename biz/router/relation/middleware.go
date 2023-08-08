@@ -35,7 +35,7 @@ func _followMw() []app.HandlerFunc {
 func _relationfollowlistMw() []app.HandlerFunc {
 	//return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
 	//	var req relation.DouyinRelationFollowListRequest
-	//	_, err := jwt.ParseToken(strconv.FormatInt(req.GetToken(), 10))
+	//	_, err := jwt.ParseToken(strconv.FormatInt(req.GetTokenUserId(), 10))
 	//	if err != nil {
 	//		ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
 	//		return
@@ -50,15 +50,6 @@ func _followerMw() []app.HandlerFunc {
 }
 
 func _relationfollowerlistMw() []app.HandlerFunc {
-	// your code...
-	//return []app.HandlerFunc{func(c context.Context, ctx *app.RequestContext) {
-	//	var req relation.DouyinRelationFollowListRequest
-	//	_, err := jwt.ParseToken(strconv.FormatInt(req.GetToken(), 10))
-	//	if err != nil {
-	//		ctx.Redirect(consts.StatusUnauthorized, []byte("/douyin/user/login/"))
-	//		return
-	//	}
-	//}}
 	return jwt.JWTAuthMiddleware()
 }
 
