@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
