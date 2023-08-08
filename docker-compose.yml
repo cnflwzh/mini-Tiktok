@@ -1,35 +1,35 @@
 version: '2'
 services:
-  tiktok-mysql:
-    image: mysql:8.1
-    container_name: tiktok-mysql
-    restart: always
-    hostname: tiktok-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: 2568
-      MYSQL_USER: tiktok
-      MYSQL_PASSWORD: tiktok
-      TZ: Asia/Shanghai
-    ports:
-      - 25681:3306
-    volumes:
-      - db_data:/var/lib/mysql
-      - ./doc/sql:/docker-entrypoint-initdb.d
-    command:
-      --character-set-server=utf8mb4
-      --collation-server=utf8mb4_general_ci
-      --explicit_defaults_for_timestamp=true
-      --ssl=0
+#  tiktok-mysql:
+#    image: mysql:8.1
+#    container_name: tiktok-mysql
+#    restart: always
+#    hostname: tiktok-mysql
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 2568
+#      MYSQL_USER: tiktok
+#      MYSQL_PASSWORD: tiktok
+#      TZ: Asia/Shanghai
+#    ports:
+#      - 25681:3306
+#    volumes:
+#      - db_data:/var/lib/mysql
+#      - ./doc/sql:/docker-entrypoint-initdb.d
+#    command:
+#      --character-set-server=utf8mb4
+#      --collation-server=utf8mb4_general_ci
+#      --explicit_defaults_for_timestamp=true
+#      --ssl=0
 
-  tiktok-redis:
-    image: redis:5.0.5
-    container_name: tiktok-redis
-    restart: always
-    hostname: tiktok-redis
-    ports:
-      - 25682:6379
-    volumes:
-      - cache_data:/data
+#  tiktok-redis:
+#    image: redis:5.0.5
+#    container_name: tiktok-redis
+#    restart: always
+#    hostname: tiktok-redis
+#    ports:
+#      - 25682:6379
+#    volumes:
+#      - cache_data:/data
 
   tiktok-server:
     image: tiktok-server
@@ -38,17 +38,15 @@ services:
     hostname: tiktok-server
     depends_on:
       - tiktok-mysql
-      - tiktok-redis
     ports:
       - 8888:8888
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      KODO_ACCESS_KEY: ${KODO_ACCESS_KEY}
-      KODO_SECRET_KEY: ${KODO_SECRET_KEY}
+      MYSQL_ADDR: ${MYSQL_ADDR}
 
-
-volumes:
-  db_data:
-  cache_data:
+#
+#volumes:
+#  db_data:
+#  cache_data:

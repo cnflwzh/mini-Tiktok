@@ -35,11 +35,11 @@ COPY --from=builder /myapp /myapp
 # 编译应用之后，复制配置文件
 COPY config/config.toml config/config.toml
 
+# 声明环境变量，该值可以在运行时通过docker命令传入
+ENV MYSQL_ADDR=$MYSQL_ADDR
 
+# 容器启动时运行的命令
 CMD ["/myapp"]
 
 # 暴露端口
 EXPOSE 8888
-
-# 容器启动时运行的命令
-CMD ["/myapp"]
