@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"gorm.io/gorm"
 	"mini-Tiktok/biz/entity"
@@ -119,7 +120,7 @@ func IsFollowing(userId int64, followId int64) (bool, error) {
 		First(&followRelation)
 
 	if result.Error != nil {
-		if result.Error == gorm.ErrRecordNotFound {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return false, nil // 没有找到记录，说明用户未关注
 		}
 		return false, result.Error

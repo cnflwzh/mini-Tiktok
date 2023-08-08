@@ -83,7 +83,7 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 			}
 			// 将Token转换为字符串
 			tokenString := string(token)
-			hlog.Info("Get Token:", tokenString)
+			//hlog.Info("Get Token:", tokenString)
 			// 解析Token
 			userID, err := ParseToken(tokenString)
 			if err != nil {
@@ -98,41 +98,41 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 				c.Request.SetQueryString(fmt.Sprintf("user_id=%d&", userID) + string(c.Request.QueryString()))
 			}
 			// 看一下params
-			hlog.Info("Params:", string(c.Request.QueryString()))
+			//hlog.Info("Params:", string(c.Request.QueryString()))
 			c.Next(ctx)
 		}}
 }
 
-// JWTGenMiddleware 由用户ID生成token的中间件
-func JWTGenMiddleware() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		func(ctx context.Context, c *app.RequestContext) {
-			// 从上下文中获取用户ID
-			userID, ok := c.Get("userID")
-			if !ok {
-				hlog.Error("Get userID from context fail")
-				c.AbortWithStatus(401)
-				return
-			}
-			// 从上下文中获取用户名
-			username, ok := c.Get("username")
-			if !ok {
-				hlog.Error("Get username from context fail")
-				c.AbortWithStatus(401)
-				return
-			}
-			// 生成Token
-			token, err := GenerateToken(username.(string), userID.(int64))
-			if err != nil {
-				hlog.Error("Generate token fail:", err)
-				c.AbortWithStatus(401)
-				return
-			}
-			// 将Token存入上下文
-			c.Set("token", token)
-			c.Next(ctx)
-		}}
-}
+//// JWTGenMiddleware 由用户ID生成token的中间件
+//func JWTGenMiddleware() []app.HandlerFunc {
+//	return []app.HandlerFunc{
+//		func(ctx context.Context, c *app.RequestContext) {
+//			// 从上下文中获取用户ID
+//			userID, ok := c.Get("userID")
+//			if !ok {
+//				hlog.Error("Get userID from context fail")
+//				c.AbortWithStatus(401)
+//				return
+//			}
+//			// 从上下文中获取用户名
+//			username, ok := c.Get("username")
+//			if !ok {
+//				hlog.Error("Get username from context fail")
+//				c.AbortWithStatus(401)
+//				return
+//			}
+//			// 生成Token
+//			token, err := GenerateToken(username.(string), userID.(int64))
+//			if err != nil {
+//				hlog.Error("Generate token fail:", err)
+//				c.AbortWithStatus(401)
+//				return
+//			}
+//			// 将Token存入上下文
+//			c.Set("token", token)
+//			c.Next(ctx)
+//		}}
+//}
 
 // CheckLoginMiddleware 用于鉴权用户是否登录
 func CheckLoginMiddleware() app.HandlerFunc {

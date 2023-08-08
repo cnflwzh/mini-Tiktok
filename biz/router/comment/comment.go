@@ -22,7 +22,7 @@ func Register(r *server.Hertz) {
 		{
 			_comment := _douyin.Group("/comment", _commentMw()...)
 			_comment.POST("/action", append(_commentactionMw(), comment.CommentAction)...)
-			_comment.GET("/list", append(_commentlistMw(), comment.CommentList)...)
+			_comment.GET("/list/", append(_commentlistMw(), comment.CommentList)...)
 		}
 	}
 }

@@ -24,15 +24,15 @@ func Register(r *server.Hertz) {
 			_relation.POST("/action", append(_relationactionMw(), relation.RelationAction)...)
 			{
 				_follow := _relation.Group("/follow", _followMw()...)
-				_follow.GET("/list", append(_relationfollowlistMw(), relation.RelationFollowList)...)
+				_follow.GET("/list/", append(_relationfollowlistMw(), relation.RelationFollowList)...)
 			}
 			{
 				_follower := _relation.Group("/follower", _followerMw()...)
-				_follower.GET("/list", append(_relationfollowerlistMw(), relation.RelationFollowerList)...)
+				_follower.GET("/list/", append(_relationfollowerlistMw(), relation.RelationFollowerList)...)
 			}
 			{
 				_friend := _relation.Group("/friend", _friendMw()...)
-				_friend.GET("/list", append(_relationfriendlistMw(), relation.RelationFriendList)...)
+				_friend.GET("/list/", append(_relationfriendlistMw(), relation.RelationFriendList)...)
 			}
 		}
 	}

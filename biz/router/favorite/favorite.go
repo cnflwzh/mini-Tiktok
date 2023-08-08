@@ -22,7 +22,7 @@ func Register(r *server.Hertz) {
 		{
 			_favorite := _douyin.Group("/favorite", _favoriteMw()...)
 			_favorite.POST("/action", append(_actionMw(), favorite.Action)...)
-			_favorite.GET("/list", append(_listMw(), favorite.List)...)
+			_favorite.GET("/list/", append(_listMw(), favorite.List)...)
 		}
 	}
 }
