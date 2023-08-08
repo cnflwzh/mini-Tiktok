@@ -21,11 +21,26 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 	var req user.DouyinUserRequest
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		utils.SendErrorResponse(c, 12001, err.Error())
 		return
 	}
 
 	resp := new(user.DouyinUserResponse)
+	userById, err := repository.GetUserById(req.GetUserId())
+	if err != nil {
+		utils.SendErrorResponse(c, 12002, err.Error())
+		return
+	}
+	isFollowing, err := repository.IsFollowing(req.GetTokenUserId(), req.GetUserId())
+	if err != nil {
+		utils.SendErrorResponse(c, 12003, err.Error())
+		return
+	}
+	commonUser := userById.ToCommonUser(isFollowing)
+
+	resp.User = commonUser
+	resp.StatusCode = proto.Int32(0)
+	resp.StatusMsg = proto.String("用户查找成功")
 
 	c.JSON(consts.StatusOK, resp)
 }

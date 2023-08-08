@@ -27,8 +27,8 @@ type DouyinUserRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId *int64  `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"` // 用户id
-	Token  *string `protobuf:"bytes,2,req,name=token" json:"token,required" form:"token,required" query:"token,required"`                      // 用户鉴权token
+	UserId      *int64 `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"`            // 用户id
+	TokenUserId *int64 `protobuf:"bytes,2,req,name=token_user_id" json:"token_user_id,required" form:"token_user_id,required" query:"token_user_id,required"` // 用户鉴权token
 }
 
 func (x *DouyinUserRequest) Reset() {
@@ -70,11 +70,11 @@ func (x *DouyinUserRequest) GetUserId() int64 {
 	return 0
 }
 
-func (x *DouyinUserRequest) GetToken() string {
-	if x != nil && x.Token != nil {
-		return *x.Token
+func (x *DouyinUserRequest) GetTokenUserId() int64 {
+	if x != nil && x.TokenUserId != nil {
+		return *x.TokenUserId
 	}
-	return ""
+	return 0
 }
 
 type DouyinUserResponse struct {

@@ -3,6 +3,7 @@ package utils
 import (
 	"mini-Tiktok/biz/model/common"
 	"mini-Tiktok/biz/repository"
+	"strconv"
 )
 
 // 提取出一个从数据库中获取用户信息并将其转换为common.User的函数
@@ -14,11 +15,11 @@ func GetUserInfoFromDb(userID int64) (*common.User, error) {
 		return nil, err
 	}
 	// 设置用户信息
-	followCount := int64(userInfo.FollowCount)
-	workCount := int64(userInfo.WorkCount)
-	favoriteCount := int64(userInfo.FavoriteCount)
+	followCount := userInfo.FollowCount
+	workCount := userInfo.WorkCount
+	favoriteCount := userInfo.FavoriteCount
 	uId := userInfo.ID
-	totalFav := string(rune(userInfo.TotalFavorited))
+	totalFav := strconv.FormatInt(userInfo.TotalFavorited, 10)
 	user := common.User{
 		Id:              &uId,
 		Name:            &userInfo.Name,
@@ -61,5 +62,6 @@ func GetVideoInfoFromDb(videoID int64) (*common.Video, error) {
 		IsFavorite:    nil, // 这里不进行设置
 		Title:         &videoInfo.Title,
 	}
+
 	return &video, nil
 }
