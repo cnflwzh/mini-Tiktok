@@ -39,6 +39,6 @@ jobs:
           file: ./docker-compose.yml
           push: true
           tags: registry.cn-beijing.aliyuncs.com/cnflwzh-docker/mini_tiktok:latest
-          build-args:
-            KODO_ACCESS_KEY: ${{ secrets.KODO_ACCESS_KEY }}
-            KODO_SECRET_KEY: ${{ secrets.KODO_SECRET_KEY }}
+        env:
+          KODO_ACCESS_KEY: ${{ secrets.KODO_ACCESS_KEY }}
+          KODO_SECRET_KEY: ${{ secrets.KODO_SECRET_KEY }}
