@@ -39,9 +39,9 @@ message douyin_message_action_response {
 service DouyinChatService {
   // 获取聊天消息
   rpc GetChatMessage(douyin_message_chat_request) returns (douyin_message_chat_response) {
-    option (api.get) = "/douyin/message/chat";
+    option (api.get) = "/douyin/message/chat/";
   }
   rpc PostMessage(douyin_message_action_request) returns (douyin_message_action_response) {
-    option (api.post) = "/douyin/message/action";
+    option (api.post) = "/douyin/message/action/";
   }
 }

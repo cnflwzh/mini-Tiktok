@@ -43,7 +43,7 @@ message douyin_user_login_response {
 
 service DouyinUserService {
   rpc GetUser(douyin_user_request) returns (douyin_user_response) {
-    option (api.get) = "/douyin/user";
+    option (api.get) = "/douyin/user/";
   }
   rpc Login(douyin_user_login_request) returns (douyin_user_login_response) {
     option (api.post) = "/douyin/user/login/";

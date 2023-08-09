@@ -29,10 +29,10 @@ message douyin_publish_list_response {
 
 service DouyinPublishService {
   rpc Publish_action(douyin_publish_action_request) returns (douyin_publish_action_response) {
-    option (api.post) = "/douyin/publish/action";
+    option (api.post) = "/douyin/publish/action/";
   }
   rpc Publish_list(douyin_publish_list_request) returns (douyin_publish_list_response) {
-    option (api.get) = "/douyin/publish/list";
+    option (api.get) = "/douyin/publish/list/";
   }
 }
 

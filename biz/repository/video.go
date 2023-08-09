@@ -43,3 +43,15 @@ func GetUserVideos(userId int64) ([]*entity.Video, error) {
 	err := config.DB.Where("user_id = ?", userId).Find(&videos).Error
 	return videos, err
 }
+
+func GetFeedVideos(dateTime string) ([]*entity.Video, error) {
+	var videos []*entity.Video
+	db := config.DB
+
+	if dateTime != "" {
+		db = db.Where("created_at < ?", dateTime)
+	}
+
+	err := db.Order("created_at desc").Limit(30).Find(&videos).Error
+	return videos, err
+}

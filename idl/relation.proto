@@ -62,18 +62,18 @@ message FriendUser {
 service DouyinRelationService {
   // 关注/取消关注
   rpc RelationAction(douyin_relation_action_request) returns (douyin_relation_action_response) {
-    option (api.post) = "/douyin/relation/action";
+    option (api.post) = "/douyin/relation/action/";
   }
   // 关注列表
   rpc RelationFollowList(douyin_relation_follow_list_request) returns (douyin_relation_follow_list_response) {
-    option (api.get) = "/douyin/relation/follow/list";
+    option (api.get) = "/douyin/relation/follow/list/";
   }
   // 粉丝列表
   rpc RelationFollowerList(douyin_relation_follower_list_request) returns (douyin_relation_follower_list_response) {
-    option (api.get) = "/douyin/relation/follower/list";
+    option (api.get) = "/douyin/relation/follower/list/";
   }
   // 好友列表
   rpc RelationFriendList(douyin_relation_friend_list_request) returns (douyin_relation_friend_list_response) {
-    option (api.get) = "/douyin/relation/friend/list";
+    option (api.get) = "/douyin/relation/friend/list/";
   }
 }
