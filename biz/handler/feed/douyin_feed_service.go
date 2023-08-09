@@ -4,6 +4,12 @@ package feed
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"google.golang.org/protobuf/proto"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/repository"
+	"mini-Tiktok/biz/utils"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -22,6 +28,36 @@ func GetDouyinFeed(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(feed.DouyinFeedResponse)
-
+	userId, err := jwt.ParseToken(req.GetToken())
+	videos, err := repository.GetFeedVideos(utils.TimestampToFormatTime(req.GetLatestTime()))
+	if err != nil {
+		utils.SendErrorResponse(c, 50001, "获取视频列表失败")
+		hlog.Error("获取视频列表失败", err)
+	}
+	responseVideoList := make([]*common.Video, 0)
+	for _, video := range videos {
+		videoUserInfo, err := repository.GetUserById(video.UserId)
+		if err != nil {
+			utils.SendErrorResponse(c, 50002, "获取视频作者信息失败")
+			hlog.Error("获取视频作者信息失败", err)
+		}
+		isFollowing, err := repository.IsFollowing(userId, videoUserInfo.ID)
+		commonUser := videoUserInfo.ToCommonUser(isFollowing)
+		isFavorite, err := repository.IsFavorite(userId, video.ID)
+		commonVideo := common.Video{
+			Id:            &video.ID,
+			Author:        commonUser,
+			PlayUrl:       &video.PlayUrl,
+			CoverUrl:      &video.CoverUrl,
+			FavoriteCount: &video.FavoriteCount,
+			CommentCount:  &video.CommentCount,
+			IsFavorite:    &isFavorite,
+			Title:         &video.Title,
+		}
+		responseVideoList = append(responseVideoList, &commonVideo)
+	}
+	resp.VideoList = responseVideoList
+	resp.StatusCode = proto.Int32(0)
+	resp.StatusMsg = proto.String("视频流获取成功")
 	c.JSON(consts.StatusOK, resp)
 }

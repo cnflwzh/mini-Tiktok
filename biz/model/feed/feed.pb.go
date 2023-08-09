@@ -27,7 +27,7 @@ type DouyinFeedRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	LatestTime *int64  `protobuf:"varint,1,opt,name=latest_time,json=latestTime" json:"latest_time,omitempty" form:"latest_time" query:"latest_time"` // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
+	LatestTime *string `protobuf:"varint,1,opt,name=latest_time,json=latestTime" json:"latest_time,omitempty" form:"latest_time" query:"latest_time"` // 可选参数，限制返回视频的最新投稿时间戳，精确到秒，不填表示当前时间
 	Token      *string `protobuf:"bytes,2,opt,name=token" json:"token,omitempty" form:"token" query:"token"`                                          // 可选参数，登录用户设置
 }
 
@@ -63,11 +63,11 @@ func (*DouyinFeedRequest) Descriptor() ([]byte, []int) {
 	return file_feed_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *DouyinFeedRequest) GetLatestTime() int64 {
+func (x *DouyinFeedRequest) GetLatestTime() string {
 	if x != nil && x.LatestTime != nil {
 		return *x.LatestTime
 	}
-	return 0
+	return ""
 }
 
 func (x *DouyinFeedRequest) GetToken() string {

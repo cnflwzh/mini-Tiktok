@@ -5,6 +5,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
 	"strings"
+	"time"
 )
 
 // HashPassword 生成加盐的哈希值
@@ -45,4 +46,14 @@ func CheckPassword(password string) bool {
 // TrimSpace 去除字符串两端的空格
 func TrimSpace(s string) string {
 	return strings.TrimSpace(s)
+}
+
+// TimestampToFormatTime 将时间戳转换为格式化的时间
+func TimestampToFormatTime(timestamp string) string {
+	t, err := time.Parse(time.RFC3339, timestamp)
+	if err != nil {
+		hlog.Error("Error parsing time: %v", err)
+		return ""
+	}
+	return t.Format("2006-01-02 15:04:05")
 }

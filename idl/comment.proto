@@ -41,11 +41,11 @@ message douyin_comment_list_response {
 service DouyinCommentService {
   // 发布或删除评论
   rpc CommentAction(douyin_comment_action_request) returns (douyin_comment_action_response) {
-    option (api.post) = "douyin/comment/action";
+    option (api.post) = "douyin/comment/action/";
   }
   // 获取评论列表
   rpc CommentList(douyin_comment_list_request) returns (douyin_comment_list_response) {
-    option (api.get) = "douyin/comment/list";
+    option (api.get) = "douyin/comment/list/";
   }
 }
 
