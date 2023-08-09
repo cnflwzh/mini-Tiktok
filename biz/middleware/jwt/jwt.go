@@ -3,8 +3,9 @@ package jwt
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
 	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
@@ -83,6 +84,17 @@ func JWTAuthMiddleware() []app.HandlerFunc {
 			}
 			// 将Token转换为字符串
 			tokenString := string(token)
+			// 当token为""时，说明无登录请求，直接跳过
+			if tokenString == "" {
+				// 加上空值的user_id
+				if c.QueryArgs().Peek("user_id") != nil {
+					c.Request.SetQueryString("token_user_id=&" + string(c.Request.QueryString()))
+				} else {
+					c.Request.SetQueryString("user_id=&" + string(c.Request.QueryString()))
+				}
+				c.Next(ctx)
+				return
+			}
 			//hlog.Info("Get Token:", tokenString)
 			// 解析Token
 			userID, err := ParseToken(tokenString)
