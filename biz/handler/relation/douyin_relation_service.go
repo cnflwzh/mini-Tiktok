@@ -36,7 +36,7 @@ func RelationAction(ctx context.Context, c *app.RequestContext) {
 	err = repository.Follow(int64(userId), int64(toUserId))
 	if err != nil {
 		StatusCode = -1
-		StatusMsg = "用户" + strconv.FormatInt(int64(userId), 10) + "关注或取关用户" + strconv.FormatInt(int64(toUserId), 10) + "失败"
+		StatusMsg = "用户关注失败" + err.Error()
 		SendErrorResponse(c, StatusCode, StatusMsg)
 		hlog.Error("follow action error:", err.Error())
 		return
