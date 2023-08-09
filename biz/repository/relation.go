@@ -10,6 +10,9 @@ import (
 )
 
 func Follow(userId int64, toUserId int64) error {
+	if userId == toUserId {
+		return errors.New("不能关注自己")
+	}
 	var userObj entity.User
 	var toUserObj entity.User
 	var followRelation entity.UserFollow
@@ -38,7 +41,11 @@ func Follow(userId int64, toUserId int64) error {
 		config.DB.Save(&toUserObj)
 		hlog.Info("User follow action is successful.")
 	} else {
-		config.DB.Model(&entity.UserFollow{}).Delete(&followRelation)
+		config.DB.Where("user_id = ?", userId).Where("follow_id = ?", toUserId).Unscoped().Delete(&followRelation)
+		if userObj.FollowCount == 0 || toUserObj.FollowerCount == 0 {
+			hlog.Info("User cancel follow action is unsuccessful.")
+			return errors.New("关注操作异常")
+		}
 		userObj.FollowCount -= 1
 		toUserObj.FollowerCount -= 1
 		config.DB.Save(&userObj)
