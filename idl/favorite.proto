@@ -30,10 +30,10 @@ message douyin_favorite_list_response {
 service DouyinFavoriteService {
   // 点赞/取消点赞
   rpc Action(douyin_favorite_action_request) returns (douyin_favorite_action_response) {
-    option (api.post) = "/douyin/favorite/action";
+    option (api.post) = "/douyin/favorite/action/";
   }
   // 获取用户点赞视频列表
   rpc List(douyin_favorite_list_request) returns (douyin_favorite_list_response) {
-    option (api.get) = "/douyin/favorite/list";
+    option (api.get) = "/douyin/favorite/list/";
   }
 }
