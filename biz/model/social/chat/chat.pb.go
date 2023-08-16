@@ -105,9 +105,9 @@ type DouyinMessageChatRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId     *int64 `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"`                         // 用户鉴权token
-	ToUserId   *int64 `protobuf:"varint,2,req,name=to_user_id,json=toUserId" json:"to_user_id,required" form:"to_user_id,required" query:"to_user_id,required"`           // 对方用户id
-	PreMsgTime *int64 `protobuf:"varint,3,req,name=pre_msg_time,json=preMsgTime" json:"pre_msg_time,required" form:"pre_msg_time,required" query:"pre_msg_time,required"` //上次最新消息的时间（新增字段-apk更新中）
+	Token      *string `protobuf:"bytes,1,req,name=token" json:"token,required" form:"token,required" query:"token,required"`                                              // 用户鉴权token
+	ToUserId   *int64  `protobuf:"varint,2,req,name=to_user_id,json=toUserId" json:"to_user_id,required" form:"to_user_id,required" query:"to_user_id,required"`           // 对方用户id
+	// PreMsgTime *int64  `protobuf:"varint,3,req,name=pre_msg_time,json=preMsgTime" json:"pre_msg_time,required" form:"pre_msg_time,required" query:"pre_msg_time,required"` //上次最新消息的时间（新增字段-apk更新中）
 }
 
 func (x *DouyinMessageChatRequest) Reset() {
@@ -142,13 +142,6 @@ func (*DouyinMessageChatRequest) Descriptor() ([]byte, []int) {
 	return file_chat_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *DouyinMessageChatRequest) GetUserId() int64 {
-	if x != nil && x.UserId != nil {
-		return *x.UserId
-	}
-	return 0
-}
-
 func (x *DouyinMessageChatRequest) GetToUserId() int64 {
 	if x != nil && x.ToUserId != nil {
 		return *x.ToUserId
@@ -156,12 +149,12 @@ func (x *DouyinMessageChatRequest) GetToUserId() int64 {
 	return 0
 }
 
-func (x *DouyinMessageChatRequest) GetPreMsgTime() int64 {
-	if x != nil && x.PreMsgTime != nil {
-		return *x.PreMsgTime
-	}
-	return 0
-}
+// func (x *DouyinMessageChatRequest) GetPreMsgTime() int64 {
+// 	if x != nil && x.PreMsgTime != nil {
+// 		return *x.PreMsgTime
+// 	}
+// 	return 0
+// }
 
 type DouyinMessageChatResponse struct {
 	state         protoimpl.MessageState
@@ -231,7 +224,7 @@ type DouyinMessageActionRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	UserId     *int64  `protobuf:"varint,1,req,name=user_id,json=userId" json:"user_id,required" form:"user_id,required" query:"user_id,required"`                     // 用户鉴权token
+	Token      *string `protobuf:"bytes,1,req,name=token" json:"token,required" form:"token,required" query:"token,required"`                                          // 用户鉴权token
 	ToUserId   *int64  `protobuf:"varint,2,req,name=to_user_id,json=toUserId" json:"to_user_id,required" form:"to_user_id,required" query:"to_user_id,required"`       // 对方用户id
 	ActionType *int32  `protobuf:"varint,3,req,name=action_type,json=actionType" json:"action_type,required" form:"action_type,required" query:"action_type,required"` // 1-发送消息
 	Content    *string `protobuf:"bytes,4,req,name=content" json:"content,required" form:"content,required" query:"content,required"`                                  // 消息内容
@@ -267,13 +260,6 @@ func (x *DouyinMessageActionRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use DouyinMessageActionRequest.ProtoReflect.Descriptor instead.
 func (*DouyinMessageActionRequest) Descriptor() ([]byte, []int) {
 	return file_chat_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *DouyinMessageActionRequest) GetUserId() int64 {
-	if x != nil && x.UserId != nil {
-		return *x.UserId
-	}
-	return 0
 }
 
 func (x *DouyinMessageActionRequest) GetToUserId() int64 {
