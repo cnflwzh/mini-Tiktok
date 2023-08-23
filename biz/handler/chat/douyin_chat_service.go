@@ -5,9 +5,14 @@ package chat
 import (
 	"context"
 
+	"mini-Tiktok/biz/entity"
+	"mini-Tiktok/biz/middleware/jwt"
+	"mini-Tiktok/biz/model/social/chat"
+	"mini-Tiktok/biz/repository"
+
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"mini-Tiktok/biz/model/social/chat"
+	"google.golang.org/protobuf/proto"
 )
 
 // GetChatMessage .
@@ -15,13 +20,62 @@ import (
 func GetChatMessage(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req chat.DouyinMessageChatRequest
+
+	// 鉴权用户是否登录
+	jwt.CheckLoginMiddleware()(ctx, c)
+
+	// 获取登录用户ID
+	loginUserId, ok := c.Get("loginUserId")
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取登录用户ID")
+		return
+	}
+	// 进行类型断言将 loginUserId 转换为 int64
+	loginUserIDInt64, ok := loginUserId.(int64)
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取正确的登录用户ID")
+		return
+	}
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(chat.DouyinMessageChatResponse)
+	// 从数据库拿出消息记录
+	messages_0, err := repository.GetInterMessagesByFromAndToUserID(
+		loginUserIDInt64,
+		*req.ToUserId,
+	)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "数据库查询聊天记录出错")
+		return
+	}
+
+	messages_1, err := repository.GetInterMessagesByFromAndToUserID(
+		*req.ToUserId,
+		loginUserIDInt64,
+	)
+	if err != nil {
+		c.String(consts.StatusInternalServerError, "数据库查询聊天记录出错")
+		return
+	}
+
+	messages := append(messages_0, messages_1...)
+
+	// 循环转换消息
+	var chatMessages []*chat.Message
+	for _, interMessage := range messages {
+		chatMessage := entity.ConvertInterMessageToMessage(&interMessage)
+		chatMessages = append(chatMessages, chatMessage)
+	}
+
+	resp := &chat.DouyinMessageChatResponse{
+		StatusCode:  proto.Int32(0),
+		StatusMsg:   proto.String("获取消息记录成功"),
+		MessageList: chatMessages,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -31,13 +85,52 @@ func GetChatMessage(ctx context.Context, c *app.RequestContext) {
 func PostMessage(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req chat.DouyinMessageActionRequest
+
+	// 鉴权用户是否登录
+	jwt.CheckLoginMiddleware()(ctx, c)
+
+	// 获取登录用户ID
+	loginUserId, ok := c.Get("loginUserId")
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取登录用户ID")
+		return
+	}
+	// 进行类型断言将 loginUserId 转换为 int64
+	loginUserIDInt64, ok := loginUserId.(int64)
+	if !ok {
+		c.String(consts.StatusInternalServerError, "无法获取正确的登录用户ID")
+		return
+	}
+
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
 		return
 	}
 
-	resp := new(chat.DouyinMessageActionResponse)
+	resp := &chat.DouyinMessageActionResponse{
+		StatusCode: proto.Int32(1),
+		StatusMsg:  proto.String(""),
+	}
+
+	// 将聊天数据放入数据库
+	if *req.ActionType == 1 {
+		_, err := repository.AddInterMessage(
+			loginUserIDInt64,
+			*req.ToUserId,
+			*req.Content,
+		)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, "向数据库添加聊天信息错误")
+			return
+		}
+
+		*resp.StatusCode = 0
+		*resp.StatusMsg = "消息发送成功"
+	} else {
+		*resp.StatusCode = 1
+		*resp.StatusMsg = "action_type值错误"
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

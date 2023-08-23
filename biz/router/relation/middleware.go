@@ -60,5 +60,5 @@ func _friendMw() []app.HandlerFunc {
 
 func _relationfriendlistMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return jwt.JWTAuthMiddleware()
 }
