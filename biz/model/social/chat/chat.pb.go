@@ -105,8 +105,8 @@ type DouyinMessageChatRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Token      *string `protobuf:"bytes,1,req,name=token" json:"token,required" form:"token,required" query:"token,required"`                                              // 用户鉴权token
-	ToUserId   *int64  `protobuf:"varint,2,req,name=to_user_id,json=toUserId" json:"to_user_id,required" form:"to_user_id,required" query:"to_user_id,required"`           // 对方用户id
+	Token    *string `protobuf:"bytes,1,req,name=token" json:"token,required" form:"token,required" query:"token,required"`                                    // 用户鉴权token
+	ToUserId *int64  `protobuf:"varint,2,req,name=to_user_id,json=toUserId" json:"to_user_id,required" form:"to_user_id,required" query:"to_user_id,required"` // 对方用户id
 	// PreMsgTime *int64  `protobuf:"varint,3,req,name=pre_msg_time,json=preMsgTime" json:"pre_msg_time,required" form:"pre_msg_time,required" query:"pre_msg_time,required"` //上次最新消息的时间（新增字段-apk更新中）
 }
 

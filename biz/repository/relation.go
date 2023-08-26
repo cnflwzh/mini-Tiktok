@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"mini-Tiktok/biz/entity"
 	"mini-Tiktok/biz/model/common"
+	"mini-Tiktok/biz/model/social/relation"
 	"mini-Tiktok/config"
 )
 
@@ -112,6 +113,58 @@ func GetFollowerList(userId int64) ([]*common.User, error) {
 			isFollow = true
 		}
 		requiredUsers[i] = users[i].ToCommonUser(isFollow)
+	}
+
+	return requiredUsers, err
+
+}
+
+func GetFriendList(userId int64) ([]*relation.FriendUser, error) {
+	var err error
+	var requiredUsers []*relation.FriendUser // 标准朋友列表
+	var followerIds []int64                  // 用户粉丝id列表
+	var followIds []int64                    // 用户关注id列表
+	var friendIds []int64                    // 朋友id列表
+	err = config.DB.Model(&entity.UserFollow{}).Select("follow_id").Where("user_id = ?", userId).Find(&followIds).Error
+	err = config.DB.Model(&entity.UserFollow{}).Select("user_id").Where("follow_id = ?", userId).Find(&followerIds).Error
+	if len(followerIds) == 0 || len(followIds) == 0 {
+		hlog.Info("朋友列表为空")
+		return nil, err
+	}
+	err = config.DB.Model(&entity.UserFollow{}).Select("user_id").Where("user_id in (?)", followIds).Where("follow_id = ?", userId).Find(&friendIds).Error
+	for _, id := range followerIds {
+		isFollowing, _ := IsFollowing(userId, id)
+		if isFollowing {
+			friendIds = append(friendIds, id)
+		}
+	}
+	requiredUsers = make([]*relation.FriendUser, len(friendIds))
+	hlog.Info(friendIds)
+	// 更新所有朋友最新消息
+	for i := 0; i < len(friendIds); i++ {
+		var MsgType int64
+		var latestMessage entity.InterMessage
+		var user entity.User
+		config.DB.Model(&entity.InterMessage{}).Order("created_at desc").
+			Where("from_user_id = ?", userId).Where("to_user_id = ?", friendIds[i]).
+			Or("from_user_id = ?", friendIds[i]).Where("to_user_id = ?", userId).
+			First(&latestMessage)
+		if latestMessage.FromUserID == userId {
+			MsgType = 1
+			config.DB.Model(&entity.User{}).Where("id = ?", latestMessage.ToUserID).First(&user)
+		} else {
+			MsgType = 0
+			config.DB.Model(&entity.User{}).Where("id = ?", latestMessage.FromUserID).First(&user)
+		}
+
+		config.DB.Model(&entity.User{}).Where("id = ?", userId).Where("to_user_id = ?", userId).
+			First(&latestMessage)
+		isFollowing, _ := IsFollowing(userId, user.ID)
+		requiredUsers[i] = &relation.FriendUser{
+			Message: &latestMessage.Content,
+			MsgType: &MsgType,
+			User:    *user.ToCommonUser(isFollowing),
+		}
 	}
 
 	return requiredUsers, err

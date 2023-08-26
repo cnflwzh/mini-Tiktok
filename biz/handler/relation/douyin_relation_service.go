@@ -132,14 +132,32 @@ func RelationFollowerList(ctx context.Context, c *app.RequestContext) {
 // @router /douyin/relation/friend/list [GET]
 func RelationFriendList(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req relation.DouyinRelationFriendListRequest
-	err = c.BindAndValidate(&req)
+	//var req relation.DouyinRelationFriendListRequest
+	id := c.FormValue("user_id")
+	userId, err := strconv.Atoi(string(id))
 	if err != nil {
 		c.String(consts.StatusBadRequest, err.Error())
+		hlog.Error("friend error:", err.Error())
 		return
 	}
 
 	resp := new(relation.DouyinRelationFriendListResponse)
+	var StatusCode int32
+	var StatusMsg string
+	var UserList []*relation.FriendUser
+	UserList, err = repository.GetFriendList(int64(userId))
+	if err != nil {
+		StatusCode = -1
+		StatusMsg = err.Error()
+		SendErrorResponse(c, StatusCode, StatusMsg)
+		hlog.Error("friend error:", err.Error())
+		return
+	}
+	resp = &relation.DouyinRelationFriendListResponse{
+		StatusCode: &StatusCode,
+		StatusMsg:  &StatusMsg,
+		UserList:   UserList,
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

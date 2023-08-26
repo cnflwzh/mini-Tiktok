@@ -503,6 +503,7 @@ type FriendUser struct {
 
 	Message *string `protobuf:"bytes,2,opt,name=message" json:"message,omitempty" form:"message" query:"message"`                   // 和该好友的最新聊天消息
 	MsgType *int64  `protobuf:"varint,3,req,name=msgType" json:"msgType,required" form:"msgType,required" query:"msgType,required"` // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
+	common.User
 }
 
 func (x *FriendUser) Reset() {
