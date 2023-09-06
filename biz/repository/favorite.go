@@ -19,15 +19,15 @@ func DeleteFavorite(userId int64, videoId int64) error {
 		return err
 	}
 	// 视频点赞数-1
-	err = config.DB.Model(&entity.Video{}).Where("id = ?", videoId).Update("favorite_count", config.DB.Raw("favorite_count - ?", 1)).Error
-	if err != nil {
-		return err
-	}
+	//err = config.DB.Model(&entity.Video{}).Where("id = ?", videoId).Update("favorite_count", config.DB.Raw("favorite_count - ?", 1)).Error
+	//if err != nil {
+	//	return err
+	//}
 	// 用户点赞数-1
-	err = config.DB.Model(&entity.User{}).Where("id = ?", userId).Update("favorite_count", config.DB.Raw("favorite_count - ?", 1)).Error
-	if err != nil {
-		return err
-	}
+	//err = config.DB.Model(&entity.User{}).Where("id = ?", userId).Update("favorite_count", config.DB.Raw("favorite_count - ?", 1)).Error
+	//if err != nil {
+	//	return err
+	//}
 	// 被点赞的视频作者的点赞数-1
 	var video entity.Video
 	err = config.DB.Where("id = ?", videoId).First(&video).Error
@@ -48,15 +48,15 @@ func AddFavorite(userId int64, videoId int64) error {
 		return err
 	}
 	// 视频点赞数+1
-	err = config.DB.Model(&entity.Video{}).Where("id = ?", videoId).Update("favorite_count", config.DB.Raw("favorite_count + ?", 1)).Error
-	if err != nil {
-		return err
-	}
+	//err = config.DB.Model(&entity.Video{}).Where("id = ?", videoId).Update("favorite_count", config.DB.Raw("favorite_count + ?", 1)).Error
+	//if err != nil {
+	//	return err
+	//}
 	// 用户点赞数+1
-	err = config.DB.Model(&entity.User{}).Where("id = ?", userId).Update("favorite_count", config.DB.Raw("favorite_count + ?", 1)).Error
-	if err != nil {
-		return err
-	}
+	//err = config.DB.Model(&entity.User{}).Where("id = ?", userId).Update("favorite_count", config.DB.Raw("favorite_count + ?", 1)).Error
+	//if err != nil {
+	//	return err
+	//}
 	// 被点赞的视频作者的点赞数+1
 	var video entity.Video
 	err = config.DB.Where("id = ?", videoId).First(&video).Error

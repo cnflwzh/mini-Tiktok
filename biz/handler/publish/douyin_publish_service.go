@@ -4,17 +4,16 @@ package publish
 
 import (
 	"context"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/common/hlog"
+	"github.com/cloudwego/hertz/pkg/protocol/consts"
+	"google.golang.org/protobuf/proto"
 	"mini-Tiktok/biz/entity"
 	"mini-Tiktok/biz/middleware/jwt"
 	"mini-Tiktok/biz/model/common"
 	"mini-Tiktok/biz/model/publish"
 	"mini-Tiktok/biz/repository"
 	"mini-Tiktok/biz/utils"
-
-	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
-	"google.golang.org/protobuf/proto"
 )
 
 // PublishAction .
@@ -49,7 +48,10 @@ func PublishAction(ctx context.Context, c *app.RequestContext) {
 		hlog.Error("数据库出错", err)
 		return
 	}
-
+	err = repository.UpdateUserWorkCount(userId)
+	if err != nil {
+		return
+	}
 	resp := &publish.DouyinPublishActionResponse{
 		StatusCode: proto.Int32(0),
 		StatusMsg:  proto.String(""),
@@ -72,8 +74,8 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 	// 获取登录用户ID
 	loginUserId, ok := c.Get("loginUserId")
 	if !ok {
-		c.String(consts.StatusInternalServerError, "无法获取登录用户ID")
-		return
+		c.String(consts.StatusInternalServerError, "当前用户未登录")
+		loginUserId = 0
 	}
 
 	err = c.BindAndValidate(&req)
@@ -96,17 +98,15 @@ func PublishList(ctx context.Context, c *app.RequestContext) {
 
 	// 进行类型断言将 loginUserId 转换为 int64
 	loginUserIDInt64, ok := loginUserId.(int64)
-	if !ok {
-		c.String(consts.StatusInternalServerError, "无法获取正确的登录用户ID")
-		return
+	var commonVideoList []*common.Video
+	if len(videoList) != 0 && videoList != nil {
+		commonVideoList, err = ConvertVideoListToProto(videoList, loginUserIDInt64)
+		if err != nil {
+			c.String(consts.StatusInternalServerError, "转换视频数据结构错误")
+			return
+		}
 	}
-
 	// 创建响应对象并将获取到的视频列表填充进去
-	commonVideoList, err := ConvertVideoListToProto(videoList, loginUserIDInt64)
-	if err != nil {
-		c.String(consts.StatusInternalServerError, "转换视频数据结构错误")
-		return
-	}
 
 	resp := &publish.DouyinPublishListResponse{
 		StatusCode: proto.Int32(1),

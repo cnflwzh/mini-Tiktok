@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"golang.org/x/crypto/bcrypt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -50,10 +52,18 @@ func TrimSpace(s string) string {
 
 // TimestampToFormatTime 将时间戳转换为格式化的时间
 func TimestampToFormatTime(timestamp string) string {
-	t, err := time.Parse(time.RFC3339, timestamp)
+	// 将字符串转换为整数
+	ms, err := strconv.ParseInt(timestamp, 10, 64)
 	if err != nil {
-		hlog.Error("Error parsing time: %v", err)
+		fmt.Printf("Error parsing timestamp to int: %v\n", err)
 		return ""
 	}
-	return t.Format("2006-01-02 15:04:05")
+
+	// 将毫秒为单位的Unix时间戳转换为time.Time类型
+	t := time.Unix(0, ms*int64(time.Millisecond))
+
+	// 获取时间的格式化字符串
+	formattedTime := t.Format("2006-01-02 15:04:05")
+
+	return formattedTime
 }
