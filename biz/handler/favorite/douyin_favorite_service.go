@@ -32,10 +32,6 @@ func Action(ctx context.Context, c *app.RequestContext) {
 		sendResponse(c, 1, err.Error())
 		return
 	}
-	if err != nil {
-		sendResponse(c, 1, err.Error())
-		return
-	}
 	// 判断当前请求是否需要执行
 	if *req.ActionType == 1 && isFavorite {
 		sendResponse(c, 2, "不能重复点赞")

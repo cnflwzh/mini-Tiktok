@@ -20,12 +20,12 @@ func _douyinMw() []app.HandlerFunc {
 
 func _favoriteMw() []app.HandlerFunc {
 	// 添加 JWTAuth 中间件
-	return JWT.JWTAuthMiddleware()
+	return nil
 }
 
 func _actionMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return JWT.JWTAuthMiddleware()
 }
 
 func _listMw() []app.HandlerFunc {

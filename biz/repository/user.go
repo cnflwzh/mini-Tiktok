@@ -39,3 +39,14 @@ func UpdateUserFavoriteCount(userId int64, favoriteCount int64) error {
 	err = config.DB.Save(&user).Error
 	return err
 }
+
+func UpdateUserWorkCount(userId int64) error {
+	var user entity.User
+	err := config.DB.Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return err
+	}
+	user.WorkCount += 1
+	err = config.DB.Save(&user).Error
+	return err
+}
